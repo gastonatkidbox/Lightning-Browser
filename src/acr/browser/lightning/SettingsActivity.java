@@ -6,10 +6,7 @@ package acr.browser.lightning;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -30,14 +27,12 @@ public class SettingsActivity extends Activity {
 	private SharedPreferences.Editor mEditPrefs;
 	private SharedPreferences mPreferences;
 	private Context mContext;
-	private Activity mActivity;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings);
 		mContext = this;
-		mActivity = this;
 		init();
 	}
 
@@ -65,7 +60,6 @@ public class SettingsActivity extends Activity {
 		mEditPrefs = mPreferences.edit();
 
 		// initialize UI
-		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
 	
 
@@ -89,8 +83,7 @@ public class SettingsActivity extends Activity {
 		version.setText(code + "");
 
 
-		RelativeLayout r2, r4, licenses;
-		r2 = (RelativeLayout) findViewById(R.id.setR2);
+		RelativeLayout r4, licenses;
 		r4 = (RelativeLayout) findViewById(R.id.setR4);
 		licenses = (RelativeLayout) findViewById(R.id.layoutLicense);
 
@@ -109,14 +102,13 @@ public class SettingsActivity extends Activity {
 		Switch fullScreen = new Switch(this);
 		Switch adblock = new Switch(this);
 
-		r2.addView(fullScreen);
 		r4.addView(adblock);
 		fullScreen.setChecked(fullScreenBool);
 
 		adblock.setChecked(mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false));
 
 		initSwitch(fullScreen, adblock);
-		clickListenerForSwitches(layoutFullScreen, layoutBlockAds, fullScreen, adblock);
+		clickListenerForSwitches(layoutBlockAds, adblock);
 
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
 
@@ -124,9 +116,7 @@ public class SettingsActivity extends Activity {
 	}
 
 
-	public void clickListenerForSwitches(RelativeLayout two,
-			RelativeLayout layoutBlockAds,
-			final Switch full, final Switch adblock) {
+	public void clickListenerForSwitches(RelativeLayout layoutBlockAds, final Switch adblock) {
 		layoutBlockAds.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -136,14 +126,6 @@ public class SettingsActivity extends Activity {
 
 		});
 
-		two.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				full.setChecked(!full.isChecked());
-			}
-
-		});
 	}
 
 	public void initSwitch(Switch fullscreen, Switch adblock) {
