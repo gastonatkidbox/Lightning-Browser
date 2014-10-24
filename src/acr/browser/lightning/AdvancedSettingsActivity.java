@@ -18,9 +18,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.webkit.*;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 
 public class AdvancedSettingsActivity extends Activity {
@@ -28,8 +25,6 @@ public class AdvancedSettingsActivity extends Activity {
 	// mPreferences variables
 	private static final int API = android.os.Build.VERSION.SDK_INT;
 	private SharedPreferences mPreferences;
-	private SharedPreferences.Editor mEditPrefs;
-	private CheckBox cb1, cb6, cb7, cbSearchSuggestions;
 	private Context mContext;
 	private boolean mSystemBrowser;
 	private Handler messageHandler;
@@ -51,10 +46,6 @@ public class AdvancedSettingsActivity extends Activity {
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 
-		// TODO WARNING: SharedPreferences.edit() without a corresponding
-		// commit() or apply() call
-		mEditPrefs = mPreferences.edit();
-
 		mSystemBrowser = mPreferences.getBoolean(PreferenceConstants.SYSTEM_BROWSER_PRESENT, false);
 		mContext = this;
 		initialize();
@@ -68,41 +59,15 @@ public class AdvancedSettingsActivity extends Activity {
 
 	private void initialize() {
 
-		RelativeLayout r1, r6, r7, r8, r10, r15, rClearCache, rSearchSuggestions;
+		RelativeLayout r8, r15, rClearCache;
 
-		r1 = (RelativeLayout) findViewById(R.id.r1);
-		r6 = (RelativeLayout) findViewById(R.id.r6);
-		r7 = (RelativeLayout) findViewById(R.id.r7);
 		r8 = (RelativeLayout) findViewById(R.id.rClearHistory);
-		r10 = (RelativeLayout) findViewById(R.id.r10);
 		r15 = (RelativeLayout) findViewById(R.id.r15);
 		rClearCache = (RelativeLayout) findViewById(R.id.rClearCache);
-		rSearchSuggestions = (RelativeLayout) findViewById(R.id.rGoogleSuggestions);
 
-		cb1 = (CheckBox) findViewById(R.id.cb1);
-		cb6 = (CheckBox) findViewById(R.id.cb6);
-		cb7 = (CheckBox) findViewById(R.id.cb7);
-		cbSearchSuggestions = (CheckBox) findViewById(R.id.cbGoogleSuggestions);
-
-		cb1.setChecked(mPreferences.getBoolean(PreferenceConstants.SAVE_PASSWORDS, true));
-
-		cb6.setChecked(mPreferences.getBoolean(PreferenceConstants.POPUPS, true));
-		cb7.setChecked(mPreferences.getBoolean(PreferenceConstants.COOKIES, true));
-		cbSearchSuggestions.setChecked(mPreferences.getBoolean(
-				PreferenceConstants.GOOGLE_SEARCH_SUGGESTIONS, true));
-
-		r1(r1);
-		r6(r6);
-		r7(r7);
 		r8(r8);
-		r10(r10);
 		r15(r15);
 		rClearCache(rClearCache);
-		rSearchSuggestions(rSearchSuggestions);
-		cb1(cb1);
-		cb6(cb6);
-		cb7(cb7);
-		cbSearchSuggestions(cbSearchSuggestions);
 
 		messageHandler = new MessageHandler(mContext);
 	}
@@ -132,93 +97,6 @@ public class AdvancedSettingsActivity extends Activity {
 			}
 			super.handleMessage(msg);
 		}
-	}
-
-	private void cb1(CheckBox view) {
-		view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.SAVE_PASSWORDS, isChecked);
-				mEditPrefs.commit();
-			}
-
-		});
-	}
-
-	private void cb6(CheckBox view) {
-		view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.POPUPS, isChecked);
-				mEditPrefs.commit();
-			}
-
-		});
-	}
-
-	private void cb7(CheckBox view) {
-		view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.COOKIES, isChecked);
-				mEditPrefs.commit();
-			}
-
-		});
-	}
-
-
-
-
-	private void cbSearchSuggestions(CheckBox view) {
-		view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.GOOGLE_SEARCH_SUGGESTIONS, isChecked);
-				mEditPrefs.commit();
-			}
-
-		});
-	}
-
-	private void r1(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				cb1.setChecked(!cb1.isChecked());
-			}
-
-		});
-	}
-
-	private void r6(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				cb6.setChecked(!cb6.isChecked());
-			}
-
-		});
-	}
-
-	private void r7(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				cb7.setChecked(!cb7.isChecked());
-			}
-
-		});
 	}
 
 	private void r8(RelativeLayout view) {
@@ -301,17 +179,6 @@ public class AdvancedSettingsActivity extends Activity {
 		});
 	}
 
-	private void rSearchSuggestions(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				cbSearchSuggestions.setChecked(!cbSearchSuggestions.isChecked());
-			}
-
-		});
-	}
-
 	private void rClearCache(RelativeLayout view) {
 		view.setOnClickListener(new OnClickListener() {
 
@@ -358,40 +225,6 @@ public class AdvancedSettingsActivity extends Activity {
 		CookieSyncManager.createInstance(this);
 		c.removeAllCookie();
 		messageHandler.sendEmptyMessage(2);
-	}
-
-	private void r10(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder picker = new AlertDialog.Builder(AdvancedSettingsActivity.this);
-				picker.setTitle(getResources().getString(R.string.title_text_size));
-
-				int n = mPreferences.getInt(PreferenceConstants.TEXT_SIZE, 3);
-
-				picker.setSingleChoiceItems(R.array.text_size, n - 1,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								mEditPrefs.putInt(PreferenceConstants.TEXT_SIZE, which + 1);
-								mEditPrefs.commit();
-
-							}
-						});
-				picker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-				picker.show();
-			}
-
-		});
 	}
 
 	public void importFromStockBrowser() {
