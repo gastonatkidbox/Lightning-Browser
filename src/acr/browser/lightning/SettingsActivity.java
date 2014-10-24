@@ -33,9 +33,7 @@ public class SettingsActivity extends Activity {
 
 	private static int API = android.os.Build.VERSION.SDK_INT;
 	private SharedPreferences.Editor mEditPrefs;
-	private int mAgentChoice;
 	private String mHomepage;
-	private TextView mAgentTextView;
 	private TextView mDownloadTextView;
 	private int mEasterEggCounter;
 	private String mDownloadLocation;
@@ -119,7 +117,6 @@ public class SettingsActivity extends Activity {
 				mSearchText.setText("Yandex");
 		}
 
-		mAgentTextView = (TextView) findViewById(R.id.agentText);
 		mHomepageText = (TextView) findViewById(R.id.homepageText);
 		mDownloadTextView = (TextView) findViewById(R.id.downloadText);
 		if (API >= 19) {
@@ -129,7 +126,6 @@ public class SettingsActivity extends Activity {
 		boolean locationBool = mPreferences.getBoolean(PreferenceConstants.LOCATION, false);
 		int flashNum = mPreferences.getInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 		boolean fullScreenBool = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
-		mAgentChoice = mPreferences.getInt(PreferenceConstants.USER_AGENT, 1);
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
 		mDownloadLocation = mPreferences.getString(PreferenceConstants.DOWNLOAD_DIRECTORY,
 				Environment.DIRECTORY_DOWNLOADS);
@@ -159,19 +155,6 @@ public class SettingsActivity extends Activity {
 			mHomepageText.setText(mHomepage);
 		}
 
-		switch (mAgentChoice) {
-			case 1:
-				mAgentTextView.setText(getResources().getString(R.string.agent_default));
-				break;
-			case 2:
-				mAgentTextView.setText(getResources().getString(R.string.agent_desktop));
-				break;
-			case 3:
-				mAgentTextView.setText(getResources().getString(R.string.agent_mobile));
-				break;
-			case 4:
-				mAgentTextView.setText(getResources().getString(R.string.agent_custom));
-		}
 		RelativeLayout r2, r3, r4, licenses;
 		r2 = (RelativeLayout) findViewById(R.id.setR2);
 		r3 = (RelativeLayout) findViewById(R.id.setR3);
@@ -211,12 +194,10 @@ public class SettingsActivity extends Activity {
 		clickListenerForSwitches(layoutFullScreen, layoutFlash, layoutBlockAds,
 				location, fullScreen, flash, adblock);
 
-		RelativeLayout agent = (RelativeLayout) findViewById(R.id.layoutUserAgent);
 		RelativeLayout download = (RelativeLayout) findViewById(R.id.layoutDownload);
 		RelativeLayout homepage = (RelativeLayout) findViewById(R.id.layoutHomepage);
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
 
-		agent(agent);
 		download(download);
 		homepage(homepage);
 		advanced(advanced);
@@ -538,87 +519,6 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-	}
-
-	public void agent(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder agentPicker = new AlertDialog.Builder(mActivity);
-				agentPicker.setTitle(getResources().getString(R.string.title_user_agent));
-				mAgentChoice = mPreferences.getInt(PreferenceConstants.USER_AGENT, 1);
-				agentPicker.setSingleChoiceItems(R.array.user_agent, mAgentChoice - 1,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								mEditPrefs.putInt(PreferenceConstants.USER_AGENT, which + 1);
-								mEditPrefs.commit();
-								switch (which + 1) {
-									case 1:
-										mAgentTextView.setText(getResources().getString(
-												R.string.agent_default));
-										break;
-									case 2:
-										mAgentTextView.setText(getResources().getString(
-												R.string.agent_desktop));
-										break;
-									case 3:
-										mAgentTextView.setText(getResources().getString(
-												R.string.agent_mobile));
-										break;
-									case 4:
-										mAgentTextView.setText(getResources().getString(
-												R.string.agent_custom));
-										agentPicker();
-										break;
-								}
-							}
-						});
-				agentPicker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								// TODO Auto-generated method stub
-
-							}
-
-						});
-				agentPicker.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						// TODO Auto-generated method stub
-						Log.i("Cancelled", "");
-					}
-				});
-				agentPicker.show();
-
-			}
-
-		});
-	}
-
-	public void agentPicker() {
-		final AlertDialog.Builder agentStringPicker = new AlertDialog.Builder(mActivity);
-
-		agentStringPicker.setTitle(getResources().getString(R.string.title_user_agent));
-		final EditText getAgent = new EditText(this);
-		agentStringPicker.setView(getAgent);
-		agentStringPicker.setPositiveButton(getResources().getString(R.string.action_ok),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String text = getAgent.getText().toString();
-						mEditPrefs.putString(PreferenceConstants.USER_AGENT_STRING, text);
-						mEditPrefs.commit();
-						mAgentTextView.setText(getResources().getString(R.string.agent_custom));
-					}
-				});
-		agentStringPicker.show();
 	}
 
 	public void download(RelativeLayout view) {
