@@ -53,8 +53,6 @@ import android.webkit.WebView.HitTestResult;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
-import info.guardianproject.onionkit.ui.OrbotHelper;
-import info.guardianproject.onionkit.web.WebkitProxy;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -422,74 +420,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 			WebIconDatabase.getInstance().open(getDir("icons", MODE_PRIVATE).getPath());
 		}
 
-		checkForTor();
-
-	}
-
-	/*
-	 * If Orbot/Tor is installed, prompt the user if they want to enable
-	 * proxying for this session
-	 */
-	public boolean checkForTor() {
-		boolean useProxy = mPreferences.getBoolean(PreferenceConstants.USE_PROXY, false);
-
-		OrbotHelper oh = new OrbotHelper(this);
-		if (oh.isOrbotInstalled()
-				&& !mPreferences.getBoolean(PreferenceConstants.INITIAL_CHECK_FOR_TOR, false)) {
-			mEditPrefs.putBoolean(PreferenceConstants.INITIAL_CHECK_FOR_TOR, true);
-			mEditPrefs.apply();
-			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch (which) {
-						case DialogInterface.BUTTON_POSITIVE:
-							mPreferences.edit().putBoolean(PreferenceConstants.USE_PROXY, true)
-									.apply();
-
-							initializeTor();
-							break;
-						case DialogInterface.BUTTON_NEGATIVE:
-							mPreferences.edit().putBoolean(PreferenceConstants.USE_PROXY, false)
-									.apply();
-							break;
-					}
-				}
-			};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(R.string.use_tor_prompt)
-					.setPositiveButton(R.string.yes, dialogClickListener)
-					.setNegativeButton(R.string.no, dialogClickListener).show();
-
-			return true;
-		} else if (oh.isOrbotInstalled() & useProxy == true) {
-			initializeTor();
-			return true;
-		} else {
-			mEditPrefs.putBoolean(PreferenceConstants.USE_PROXY, false);
-			mEditPrefs.apply();
-			return false;
-		}
-	}
-
-	/*
-	 * Initialize WebKit Proxying for Tor
-	 */
-	public void initializeTor() {
-
-		OrbotHelper oh = new OrbotHelper(this);
-		if (!oh.isOrbotRunning()) {
-			oh.requestOrbotStart(this);
-		}
-		try {
-			String host = mPreferences.getString(PreferenceConstants.USE_PROXY_HOST, "localhost");
-			int port = mPreferences.getInt(PreferenceConstants.USE_PROXY_PORT, 8118);
-			WebkitProxy.setProxy("acr.browser.lightning.BrowserApp", getApplicationContext(), host,
-					port);
-		} catch (Exception e) {
-			Log.d(Constants.TAG, "error enabling web proxying", e);
-		}
-
 	}
 
 	public void setNavigationDrawerWidth() {
@@ -611,15 +541,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		}
 
 		updateCookiePreference();
-		if (mPreferences.getBoolean(PreferenceConstants.USE_PROXY, false)) {
-			initializeTor();
-		} else {
-			try {
-				WebkitProxy.resetProxy("acr.browser.lightning.BrowserApp", getApplicationContext());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/*

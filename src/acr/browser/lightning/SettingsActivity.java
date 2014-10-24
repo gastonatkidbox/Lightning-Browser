@@ -28,7 +28,6 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import info.guardianproject.onionkit.ui.OrbotHelper;
 
 public class SettingsActivity extends Activity {
 
@@ -84,7 +83,6 @@ public class SettingsActivity extends Activity {
 		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
 		RelativeLayout layoutFlash = (RelativeLayout) findViewById(R.id.layoutFlash);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
-		RelativeLayout layoutOrbot = (RelativeLayout) findViewById(R.id.layoutUseOrbot);
 		RelativeLayout layoutBookmarks = (RelativeLayout) findViewById(R.id.layoutBookmarks);
 		
 		layoutBookmarks.setOnClickListener(new OnClickListener(){
@@ -202,12 +200,11 @@ public class SettingsActivity extends Activity {
 			case 4:
 				mAgentTextView.setText(getResources().getString(R.string.agent_custom));
 		}
-		RelativeLayout r1, r2, r3, r4, r5, licenses;
+		RelativeLayout r1, r2, r3, r4, licenses;
 		r1 = (RelativeLayout) findViewById(R.id.setR1);
 		r2 = (RelativeLayout) findViewById(R.id.setR2);
 		r3 = (RelativeLayout) findViewById(R.id.setR3);
 		r4 = (RelativeLayout) findViewById(R.id.setR4);
-		r5 = (RelativeLayout) findViewById(R.id.setR5);
 		licenses = (RelativeLayout) findViewById(R.id.layoutLicense);
 
 		licenses.setOnClickListener(new OnClickListener() {
@@ -226,13 +223,11 @@ public class SettingsActivity extends Activity {
 		Switch fullScreen = new Switch(this);
 		Switch flash = new Switch(this);
 		Switch adblock = new Switch(this);
-		Switch orbot = new Switch(this);
 
 		r1.addView(location);
 		r2.addView(fullScreen);
 		r3.addView(flash);
 		r4.addView(adblock);
-		r5.addView(orbot);
 		location.setChecked(locationBool);
 		fullScreen.setChecked(fullScreenBool);
 		if (flashNum > 0) {
@@ -241,11 +236,10 @@ public class SettingsActivity extends Activity {
 			flash.setChecked(false);
 		}
 		adblock.setChecked(mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false));
-		orbot.setChecked(mPreferences.getBoolean(PreferenceConstants.USE_PROXY, false));
 
-		initSwitch(location, fullScreen, flash, adblock, orbot);
+		initSwitch(location, fullScreen, flash, adblock);
 		clickListenerForSwitches(layoutLocation, layoutFullScreen, layoutFlash, layoutBlockAds,
-				layoutOrbot, location, fullScreen, flash, adblock, orbot);
+				location, fullScreen, flash, adblock);
 
 		RelativeLayout agent = (RelativeLayout) findViewById(R.id.layoutUserAgent);
 		RelativeLayout download = (RelativeLayout) findViewById(R.id.layoutDownload);
@@ -411,9 +405,8 @@ public class SettingsActivity extends Activity {
 	}
 
 	public void clickListenerForSwitches(RelativeLayout one, RelativeLayout two,
-			RelativeLayout three, RelativeLayout layoutBlockAds, RelativeLayout layoutOrbot,
-			final Switch loc, final Switch full, final Switch flash, final Switch adblock,
-			final Switch orbot) {
+			RelativeLayout three, RelativeLayout layoutBlockAds,
+			final Switch loc, final Switch full, final Switch flash, final Switch adblock) {
 		layoutBlockAds.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -452,18 +445,6 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-		layoutOrbot.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (orbot.isEnabled()) {
-					orbot.setChecked(!orbot.isChecked());
-				} else {
-					Utils.showToast(mContext, getResources().getString(R.string.install_orbot));
-				}
-			}
-
-		});
 	}
 
 	public void easterEgg() {
@@ -486,8 +467,7 @@ public class SettingsActivity extends Activity {
 		});
 	}
 
-	public void initSwitch(Switch location, Switch fullscreen, Switch flash, Switch adblock,
-			Switch orbot) {
+	public void initSwitch(Switch location, Switch fullscreen, Switch flash, Switch adblock) {
 		adblock.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -550,21 +530,6 @@ public class SettingsActivity extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				mEditPrefs.putBoolean(PreferenceConstants.FULL_SCREEN, isChecked);
-				mEditPrefs.commit();
-
-			}
-
-		});
-		OrbotHelper oh = new OrbotHelper(this);
-		if (!oh.isOrbotInstalled()) {
-			orbot.setEnabled(false);
-		}
-
-		orbot.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.USE_PROXY, isChecked);
 				mEditPrefs.commit();
 
 			}
