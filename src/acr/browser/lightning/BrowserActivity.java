@@ -601,38 +601,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 					}
 				}
 				return true;
-			case R.id.action_new_tab:
-				newTab(null, true);
-				return true;
-			case R.id.action_incognito:
-				startActivity(new Intent(this, IncognitoActivity.class));
-				return true;
-			case R.id.action_share:
-				if (!mCurrentView.getUrl().startsWith(Constants.FILE)) {
-					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-					shareIntent.setType("text/plain");
-					shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-							mCurrentView.getTitle());
-					String shareMessage = mCurrentView.getUrl();
-					shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareMessage);
-					startActivity(Intent.createChooser(shareIntent,
-							getResources().getString(R.string.dialog_title_share)));
-				}
-				return true;
+
 			case R.id.action_bookmarks:
 				openBookmarks();
-				return true;
-			case R.id.action_copy:
-				if (mCurrentView != null) {
-					if (!mCurrentView.getUrl().startsWith(Constants.FILE)) {
-						ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-						ClipData clip = ClipData.newPlainText("label", mCurrentView.getUrl()
-								.toString());
-						clipboard.setPrimaryClip(clip);
-						Utils.showToast(mContext,
-								mContext.getResources().getString(R.string.message_link_copied));
-					}
-				}
 				return true;
 			case R.id.action_settings:
 				startActivity(new Intent(this, SettingsActivity.class));
@@ -652,9 +623,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 					}
 				}
 				return true;
-			case R.id.action_find:
-				findInPage();
-				return true;
+
 			default:
 				return super.onOptionsItemSelected(item);
 		}
