@@ -16,12 +16,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,9 +29,6 @@ public class SettingsActivity extends Activity {
 	private static int API = android.os.Build.VERSION.SDK_INT;
 	private SharedPreferences.Editor mEditPrefs;
 	private String mHomepage;
-	private TextView mDownloadTextView;
-	private int mEasterEggCounter;
-	private String mDownloadLocation;
 	private TextView mHomepageText;
 	private SharedPreferences mPreferences;
 	private Context mContext;
@@ -81,7 +73,6 @@ public class SettingsActivity extends Activity {
 	
 
 		mHomepageText = (TextView) findViewById(R.id.homepageText);
-		mDownloadTextView = (TextView) findViewById(R.id.downloadText);
 		if (API >= 19) {
 			mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 			mEditPrefs.commit();
@@ -90,11 +81,7 @@ public class SettingsActivity extends Activity {
 		int flashNum = mPreferences.getInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 		boolean fullScreenBool = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
-		mDownloadLocation = mPreferences.getString(PreferenceConstants.DOWNLOAD_DIRECTORY,
-				Environment.DIRECTORY_DOWNLOADS);
-
-		mDownloadTextView.setText(Constants.EXTERNAL_STORAGE + '/' + mDownloadLocation);
-
+		
 		String code = "HOLO";
 
 		try {
@@ -157,11 +144,9 @@ public class SettingsActivity extends Activity {
 		clickListenerForSwitches(layoutFullScreen, layoutFlash, layoutBlockAds,
 				location, fullScreen, flash, adblock);
 
-		RelativeLayout download = (RelativeLayout) findViewById(R.id.layoutDownload);
 		RelativeLayout homepage = (RelativeLayout) findViewById(R.id.layoutHomepage);
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
 
-		download(download);
 		homepage(homepage);
 		advanced(advanced);
 	}
@@ -366,59 +351,6 @@ public class SettingsActivity extends Activity {
 		});
 	}
 
-	public void download(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				AlertDialog.Builder picker = new AlertDialog.Builder(mActivity);
-				picker.setTitle(getResources().getString(R.string.title_download_location));
-				mDownloadLocation = mPreferences.getString(PreferenceConstants.DOWNLOAD_DIRECTORY,
-						Environment.DIRECTORY_DOWNLOADS);
-				int n;
-				if (mDownloadLocation.contains(Environment.DIRECTORY_DOWNLOADS)) {
-					n = 1;
-				} else {
-					n = 2;
-				}
-
-				picker.setSingleChoiceItems(R.array.download_folder, n - 1,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-								switch (which + 1) {
-									case 1:
-										mEditPrefs.putString(
-												PreferenceConstants.DOWNLOAD_DIRECTORY,
-												Environment.DIRECTORY_DOWNLOADS);
-										mEditPrefs.commit();
-										mDownloadTextView.setText(Constants.EXTERNAL_STORAGE + '/'
-												+ Environment.DIRECTORY_DOWNLOADS);
-										break;
-									case 2:
-										downPicker();
-
-										break;
-								}
-							}
-						});
-				picker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-				picker.show();
-			}
-
-		});
-	}
-
 	public void homePicker() {
 		final AlertDialog.Builder homePicker = new AlertDialog.Builder(mActivity);
 		homePicker.setTitle(getResources().getString(R.string.title_custom_homepage));
@@ -442,52 +374,6 @@ public class SettingsActivity extends Activity {
 					}
 				});
 		homePicker.show();
-	}
-
-	@SuppressWarnings("deprecation")
-	public void downPicker() {
-		final AlertDialog.Builder downLocationPicker = new AlertDialog.Builder(mActivity);
-		LinearLayout layout = new LinearLayout(this);
-		downLocationPicker.setTitle(getResources().getString(R.string.title_download_location));
-		final EditText getDownload = new EditText(this);
-		getDownload.setBackgroundResource(0);
-		mDownloadLocation = mPreferences.getString(PreferenceConstants.DOWNLOAD_DIRECTORY,
-				Environment.DIRECTORY_DOWNLOADS);
-		int padding = Utils.convertToDensityPixels(this, 10);
-
-		LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-		getDownload.setLayoutParams(lparams);
-		getDownload.setTextColor(Color.DKGRAY);
-		getDownload.setText(mDownloadLocation);
-		getDownload.setPadding(0, padding, padding, padding);
-
-		TextView v = new TextView(this);
-		v.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-		v.setTextColor(Color.DKGRAY);
-		v.setText(Constants.EXTERNAL_STORAGE + '/');
-		v.setPadding(padding, padding, 0, padding);
-		layout.addView(v);
-		layout.addView(getDownload);
-		if (API < 16) {
-			layout.setBackgroundDrawable(getResources().getDrawable(android.R.drawable.edit_text));
-		} else {
-			layout.setBackground(getResources().getDrawable(android.R.drawable.edit_text));
-		}
-		downLocationPicker.setView(layout);
-		downLocationPicker.setPositiveButton(getResources().getString(R.string.action_ok),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String text = getDownload.getText().toString();
-						mEditPrefs.putString(PreferenceConstants.DOWNLOAD_DIRECTORY, text);
-						mEditPrefs.commit();
-						mDownloadTextView.setText(Constants.EXTERNAL_STORAGE + '/' + text);
-					}
-				});
-		downLocationPicker.show();
 	}
 
 	public void homepage(RelativeLayout view) {
