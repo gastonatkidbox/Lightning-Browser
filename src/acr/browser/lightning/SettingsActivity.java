@@ -83,17 +83,7 @@ public class SettingsActivity extends Activity {
 		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
 		RelativeLayout layoutFlash = (RelativeLayout) findViewById(R.id.layoutFlash);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
-		RelativeLayout layoutBookmarks = (RelativeLayout) findViewById(R.id.layoutBookmarks);
 		
-		layoutBookmarks.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(mContext, BookmarkActivity.class));
-			}
-			
-		});
-
 		mSearchText = (TextView) findViewById(R.id.searchText);
 		mRenderText = (TextView) findViewById(R.id.renderText);
 
