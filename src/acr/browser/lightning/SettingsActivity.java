@@ -42,7 +42,6 @@ public class SettingsActivity extends Activity {
 	private TextView mHomepageText;
 	private SharedPreferences mPreferences;
 	private TextView mSearchText;
-	private TextView mRenderText;
 	private Context mContext;
 	private Activity mActivity;
 
@@ -85,7 +84,6 @@ public class SettingsActivity extends Activity {
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
 		
 		mSearchText = (TextView) findViewById(R.id.searchText);
-		mRenderText = (TextView) findViewById(R.id.renderText);
 
 		switch (mPreferences.getInt(PreferenceConstants.SEARCH, 1)) {
 			case 0:
@@ -120,21 +118,6 @@ public class SettingsActivity extends Activity {
 				break;
 			case 10:
 				mSearchText.setText("Yandex");
-		}
-
-		switch (mPreferences.getInt(PreferenceConstants.RENDERING_MODE, 0)) {
-			case 0:
-				mRenderText.setText(mContext.getString(R.string.name_normal));
-				break;
-			case 1:
-				mRenderText.setText(mContext.getString(R.string.name_inverted));
-				break;
-			case 2:
-				mRenderText.setText(mContext.getString(R.string.name_grayscale));
-				break;
-			case 3:
-				mRenderText.setText(mContext.getString(R.string.name_inverted_grayscale));
-				break;
 		}
 
 		mAgentTextView = (TextView) findViewById(R.id.agentText);
@@ -241,7 +224,6 @@ public class SettingsActivity extends Activity {
 		homepage(homepage);
 		advanced(advanced);
 		search();
-		renderPicker();
 		easterEgg();
 	}
 
@@ -316,56 +298,6 @@ public class SettingsActivity extends Activity {
 		});
 	}
 
-	public void renderPicker() {
-		LinearLayout layout = (LinearLayout) findViewById(R.id.layoutRendering);
-		layout.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder picker = new AlertDialog.Builder(mActivity);
-				picker.setTitle(getResources().getString(R.string.rendering_mode));
-				CharSequence[] chars = { mContext.getString(R.string.name_normal),
-						mContext.getString(R.string.name_inverted),
-						mContext.getString(R.string.name_grayscale),
-						mContext.getString(R.string.name_inverted_grayscale) };
-
-				int n = mPreferences.getInt(PreferenceConstants.RENDERING_MODE, 0);
-
-				picker.setSingleChoiceItems(chars, n, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mEditPrefs.putInt(PreferenceConstants.RENDERING_MODE, which).apply();
-						switch (which) {
-							case 0:
-								mRenderText.setText(mContext.getString(R.string.name_normal));
-								break;
-							case 1:
-								mRenderText.setText(mContext.getString(R.string.name_inverted));
-								break;
-							case 2:
-								mRenderText.setText(mContext.getString(R.string.name_grayscale));
-								break;
-							case 3:
-								mRenderText.setText(mContext
-										.getString(R.string.name_inverted_grayscale));
-								break;
-						}
-					}
-				});
-				picker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-				picker.show();
-			}
-
-		});
-	}
 
 	public void searchUrlPicker() {
 		final AlertDialog.Builder urlPicker = new AlertDialog.Builder(this);
