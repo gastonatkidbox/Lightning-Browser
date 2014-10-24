@@ -39,7 +39,6 @@ public class SettingsActivity extends Activity {
 	private String mDownloadLocation;
 	private TextView mHomepageText;
 	private SharedPreferences mPreferences;
-	private TextView mSearchText;
 	private Context mContext;
 	private Activity mActivity;
 
@@ -79,43 +78,7 @@ public class SettingsActivity extends Activity {
 		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
 		RelativeLayout layoutFlash = (RelativeLayout) findViewById(R.id.layoutFlash);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
-		
-		mSearchText = (TextView) findViewById(R.id.searchText);
-
-		switch (mPreferences.getInt(PreferenceConstants.SEARCH, 1)) {
-			case 0:
-				mSearchText.setText(getResources().getString(R.string.custom_url));
-				break;
-			case 1:
-				mSearchText.setText("Google");
-				break;
-			case 2:
-				mSearchText.setText("Android Search");
-				break;
-			case 3:
-				mSearchText.setText("Bing");
-				break;
-			case 4:
-				mSearchText.setText("Yahoo");
-				break;
-			case 5:
-				mSearchText.setText("StartPage");
-				break;
-			case 6:
-				mSearchText.setText("StartPage (Mobile)");
-				break;
-			case 7:
-				mSearchText.setText("DuckDuckGo");
-				break;
-			case 8:
-				mSearchText.setText("DuckDuckGo Lite");
-				break;
-			case 9:
-				mSearchText.setText("Baidu");
-				break;
-			case 10:
-				mSearchText.setText("Yandex");
-		}
+	
 
 		mHomepageText = (TextView) findViewById(R.id.homepageText);
 		mDownloadTextView = (TextView) findViewById(R.id.downloadText);
@@ -201,106 +164,8 @@ public class SettingsActivity extends Activity {
 		download(download);
 		homepage(homepage);
 		advanced(advanced);
-		search();
-		easterEgg();
 	}
 
-	public void search() {
-		RelativeLayout search = (RelativeLayout) findViewById(R.id.layoutSearch);
-		search.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder picker = new AlertDialog.Builder(mActivity);
-				picker.setTitle(getResources().getString(R.string.title_search_engine));
-				CharSequence[] chars = { getResources().getString(R.string.custom_url), "Google",
-						"Android Search", "Bing", "Yahoo", "StartPage", "StartPage (Mobile)",
-						"DuckDuckGo (Privacy)", "DuckDuckGo Lite (Privacy)", "Baidu (Chinese)",
-						"Yandex (Russian)" };
-
-				int n = mPreferences.getInt(PreferenceConstants.SEARCH, 1);
-
-				picker.setSingleChoiceItems(chars, n, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mEditPrefs.putInt(PreferenceConstants.SEARCH, which);
-						mEditPrefs.commit();
-						switch (which) {
-							case 0:
-								searchUrlPicker();
-								break;
-							case 1:
-								mSearchText.setText("Google");
-								break;
-							case 2:
-								mSearchText.setText("Android Search");
-								break;
-							case 3:
-								mSearchText.setText("Bing");
-								break;
-							case 4:
-								mSearchText.setText("Yahoo");
-								break;
-							case 5:
-								mSearchText.setText("StartPage");
-								break;
-							case 6:
-								mSearchText.setText("StartPage (Mobile)");
-								break;
-							case 7:
-								mSearchText.setText("DuckDuckGo");
-								break;
-							case 8:
-								mSearchText.setText("DuckDuckGo Lite");
-								break;
-							case 9:
-								mSearchText.setText("Baidu");
-								break;
-							case 10:
-								mSearchText.setText("Yandex");
-						}
-					}
-				});
-				picker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-				picker.show();
-			}
-
-		});
-	}
-
-
-	public void searchUrlPicker() {
-		final AlertDialog.Builder urlPicker = new AlertDialog.Builder(this);
-
-		urlPicker.setTitle(getResources().getString(R.string.custom_url));
-		final EditText getSearchUrl = new EditText(this);
-
-		String mSearchUrl = mPreferences.getString(PreferenceConstants.SEARCH_URL,
-				Constants.GOOGLE_SEARCH);
-		getSearchUrl.setText(mSearchUrl);
-		urlPicker.setView(getSearchUrl);
-		urlPicker.setPositiveButton(getResources().getString(R.string.action_ok),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String text = getSearchUrl.getText().toString();
-						mEditPrefs.putString(PreferenceConstants.SEARCH_URL, text);
-						mEditPrefs.commit();
-						mSearchText.setText(getResources().getString(R.string.custom_url) + ": "
-								+ text);
-					}
-				});
-		urlPicker.show();
-	}
 
 	public void clickListenerForSwitches(RelativeLayout two,
 			RelativeLayout three, RelativeLayout layoutBlockAds,
@@ -332,26 +197,6 @@ public class SettingsActivity extends Activity {
 					Utils.createInformativeDialog(mContext,
 							getResources().getString(R.string.title_warning), getResources()
 									.getString(R.string.dialog_adobe_dead));
-				}
-			}
-
-		});
-	}
-
-	public void easterEgg() {
-		RelativeLayout easter = (RelativeLayout) findViewById(R.id.layoutVersion);
-		easter.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				mEasterEggCounter++;
-				if (mEasterEggCounter == 10) {
-
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri
-							.parse("http://imgs.xkcd.com/comics/compiling.png"), mContext,
-							MainActivity.class));
-					finish();
-					mEasterEggCounter = 0;
 				}
 			}
 
