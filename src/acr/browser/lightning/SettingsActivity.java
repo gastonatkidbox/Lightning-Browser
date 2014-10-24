@@ -66,7 +66,6 @@ public class SettingsActivity extends Activity {
 
 		// initialize UI
 		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
-		RelativeLayout layoutFlash = (RelativeLayout) findViewById(R.id.layoutFlash);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
 	
 
@@ -74,8 +73,6 @@ public class SettingsActivity extends Activity {
 			mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 			mEditPrefs.commit();
 		}
-		boolean locationBool = mPreferences.getBoolean(PreferenceConstants.LOCATION, false);
-		int flashNum = mPreferences.getInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 		boolean fullScreenBool = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
 		
 		String code = "HOLO";
@@ -92,9 +89,8 @@ public class SettingsActivity extends Activity {
 		version.setText(code + "");
 
 
-		RelativeLayout r2, r3, r4, licenses;
+		RelativeLayout r2, r4, licenses;
 		r2 = (RelativeLayout) findViewById(R.id.setR2);
-		r3 = (RelativeLayout) findViewById(R.id.setR3);
 		r4 = (RelativeLayout) findViewById(R.id.setR4);
 		licenses = (RelativeLayout) findViewById(R.id.layoutLicense);
 
@@ -110,26 +106,17 @@ public class SettingsActivity extends Activity {
 
 		});
 
-		Switch location = new Switch(this);
 		Switch fullScreen = new Switch(this);
-		Switch flash = new Switch(this);
 		Switch adblock = new Switch(this);
 
 		r2.addView(fullScreen);
-		r3.addView(flash);
 		r4.addView(adblock);
-		location.setChecked(locationBool);
 		fullScreen.setChecked(fullScreenBool);
-		if (flashNum > 0) {
-			flash.setChecked(true);
-		} else {
-			flash.setChecked(false);
-		}
+
 		adblock.setChecked(mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false));
 
-		initSwitch(location, fullScreen, flash, adblock);
-		clickListenerForSwitches(layoutFullScreen, layoutFlash, layoutBlockAds,
-				location, fullScreen, flash, adblock);
+		initSwitch(fullScreen, adblock);
+		clickListenerForSwitches(layoutFullScreen, layoutBlockAds, fullScreen, adblock);
 
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
 
@@ -138,8 +125,8 @@ public class SettingsActivity extends Activity {
 
 
 	public void clickListenerForSwitches(RelativeLayout two,
-			RelativeLayout three, RelativeLayout layoutBlockAds,
-			final Switch loc, final Switch full, final Switch flash, final Switch adblock) {
+			RelativeLayout layoutBlockAds,
+			final Switch full, final Switch adblock) {
 		layoutBlockAds.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -157,23 +144,9 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-		three.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (API < 19) {
-					flash.setChecked(!flash.isChecked());
-				} else {
-					Utils.createInformativeDialog(mContext,
-							getResources().getString(R.string.title_warning), getResources()
-									.getString(R.string.dialog_adobe_dead));
-				}
-			}
-
-		});
 	}
 
-	public void initSwitch(Switch location, Switch fullscreen, Switch flash, Switch adblock) {
+	public void initSwitch(Switch fullscreen, Switch adblock) {
 		adblock.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -183,54 +156,7 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-		location.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.LOCATION, isChecked);
-				mEditPrefs.commit();
-
-			}
-
-		});
-		flash.setEnabled(API < 19);
-		flash.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					getFlashChoice();
-				} else {
-					mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
-					mEditPrefs.commit();
-				}
-
-				boolean flashInstalled = false;
-				try {
-					PackageManager pm = getPackageManager();
-					ApplicationInfo ai = pm.getApplicationInfo("com.adobe.flashplayer", 0);
-					if (ai != null) {
-						flashInstalled = true;
-					}
-				} catch (NameNotFoundException e) {
-					flashInstalled = false;
-				}
-				if (!flashInstalled && isChecked) {
-					Utils.createInformativeDialog(SettingsActivity.this,
-							getResources().getString(R.string.title_warning), getResources()
-									.getString(R.string.dialog_adobe_not_installed));
-					buttonView.setChecked(false);
-					mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
-					mEditPrefs.commit();
-
-				} else if ((API >= 17) && isChecked) {
-					Utils.createInformativeDialog(SettingsActivity.this,
-							getResources().getString(R.string.title_warning), getResources()
-									.getString(R.string.dialog_adobe_unsupported));
-				}
-			}
-
-		});
 		fullscreen.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -241,40 +167,6 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-	}
-
-	private void getFlashChoice() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-		builder.setTitle(mContext.getResources().getString(R.string.title_flash));
-		builder.setMessage(getResources().getString(R.string.flash))
-				.setCancelable(true)
-				.setPositiveButton(getResources().getString(R.string.action_manual),
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 1);
-								mEditPrefs.commit();
-							}
-						})
-				.setNegativeButton(getResources().getString(R.string.action_auto),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 2);
-								mEditPrefs.commit();
-							}
-						}).setOnCancelListener(new OnCancelListener() {
-
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
-						mEditPrefs.commit();
-					}
-
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
 	}
 
 	public void initCheckBox(CheckBox location, CheckBox fullscreen, CheckBox flash) {
