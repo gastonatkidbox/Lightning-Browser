@@ -245,13 +245,11 @@ public class SettingsActivity extends Activity {
 		RelativeLayout download = (RelativeLayout) findViewById(R.id.layoutDownload);
 		RelativeLayout homepage = (RelativeLayout) findViewById(R.id.layoutHomepage);
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
-		RelativeLayout source = (RelativeLayout) findViewById(R.id.layoutSource);
 
 		agent(agent);
 		download(download);
 		homepage(homepage);
 		advanced(advanced);
-		source(source);
 		search();
 		renderPicker();
 		easterEgg();
@@ -911,19 +909,6 @@ public class SettingsActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(mContext, AdvancedSettingsActivity.class));
-			}
-
-		});
-	}
-
-	public void source(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri
-						.parse("http://twitter.com/ACRDevelopment"), mContext, MainActivity.class));
-				finish();
 			}
 
 		});
