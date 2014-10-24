@@ -78,7 +78,6 @@ public class SettingsActivity extends Activity {
 		mEditPrefs = mPreferences.edit();
 
 		// initialize UI
-		RelativeLayout layoutLocation = (RelativeLayout) findViewById(R.id.layoutLocation);
 		RelativeLayout layoutFullScreen = (RelativeLayout) findViewById(R.id.layoutFullScreen);
 		RelativeLayout layoutFlash = (RelativeLayout) findViewById(R.id.layoutFlash);
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
@@ -173,8 +172,7 @@ public class SettingsActivity extends Activity {
 			case 4:
 				mAgentTextView.setText(getResources().getString(R.string.agent_custom));
 		}
-		RelativeLayout r1, r2, r3, r4, licenses;
-		r1 = (RelativeLayout) findViewById(R.id.setR1);
+		RelativeLayout r2, r3, r4, licenses;
 		r2 = (RelativeLayout) findViewById(R.id.setR2);
 		r3 = (RelativeLayout) findViewById(R.id.setR3);
 		r4 = (RelativeLayout) findViewById(R.id.setR4);
@@ -197,7 +195,6 @@ public class SettingsActivity extends Activity {
 		Switch flash = new Switch(this);
 		Switch adblock = new Switch(this);
 
-		r1.addView(location);
 		r2.addView(fullScreen);
 		r3.addView(flash);
 		r4.addView(adblock);
@@ -211,7 +208,7 @@ public class SettingsActivity extends Activity {
 		adblock.setChecked(mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false));
 
 		initSwitch(location, fullScreen, flash, adblock);
-		clickListenerForSwitches(layoutLocation, layoutFullScreen, layoutFlash, layoutBlockAds,
+		clickListenerForSwitches(layoutFullScreen, layoutFlash, layoutBlockAds,
 				location, fullScreen, flash, adblock);
 
 		RelativeLayout agent = (RelativeLayout) findViewById(R.id.layoutUserAgent);
@@ -324,7 +321,7 @@ public class SettingsActivity extends Activity {
 		urlPicker.show();
 	}
 
-	public void clickListenerForSwitches(RelativeLayout one, RelativeLayout two,
+	public void clickListenerForSwitches(RelativeLayout two,
 			RelativeLayout three, RelativeLayout layoutBlockAds,
 			final Switch loc, final Switch full, final Switch flash, final Switch adblock) {
 		layoutBlockAds.setOnClickListener(new OnClickListener() {
@@ -335,14 +332,7 @@ public class SettingsActivity extends Activity {
 			}
 
 		});
-		one.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				loc.setChecked(!loc.isChecked());
-			}
-
-		});
 		two.setOnClickListener(new OnClickListener() {
 
 			@Override
