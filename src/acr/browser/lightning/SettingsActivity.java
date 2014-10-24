@@ -28,8 +28,6 @@ public class SettingsActivity extends Activity {
 
 	private static int API = android.os.Build.VERSION.SDK_INT;
 	private SharedPreferences.Editor mEditPrefs;
-	private String mHomepage;
-	private TextView mHomepageText;
 	private SharedPreferences mPreferences;
 	private Context mContext;
 	private Activity mActivity;
@@ -72,7 +70,6 @@ public class SettingsActivity extends Activity {
 		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
 	
 
-		mHomepageText = (TextView) findViewById(R.id.homepageText);
 		if (API >= 19) {
 			mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 			mEditPrefs.commit();
@@ -80,7 +77,6 @@ public class SettingsActivity extends Activity {
 		boolean locationBool = mPreferences.getBoolean(PreferenceConstants.LOCATION, false);
 		int flashNum = mPreferences.getInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 		boolean fullScreenBool = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
-		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
 		
 		String code = "HOLO";
 
@@ -95,15 +91,6 @@ public class SettingsActivity extends Activity {
 		TextView version = (TextView) findViewById(R.id.versionCode);
 		version.setText(code + "");
 
-		if (mHomepage.contains("about:home")) {
-			mHomepageText.setText(getResources().getString(R.string.action_homepage));
-		} else if (mHomepage.contains("about:blank")) {
-			mHomepageText.setText(getResources().getString(R.string.action_blank));
-		} else if (mHomepage.contains("about:bookmarks")) {
-			mHomepageText.setText(getResources().getString(R.string.action_bookmarks));
-		} else {
-			mHomepageText.setText(mHomepage);
-		}
 
 		RelativeLayout r2, r3, r4, licenses;
 		r2 = (RelativeLayout) findViewById(R.id.setR2);
@@ -144,10 +131,8 @@ public class SettingsActivity extends Activity {
 		clickListenerForSwitches(layoutFullScreen, layoutFlash, layoutBlockAds,
 				location, fullScreen, flash, adblock);
 
-		RelativeLayout homepage = (RelativeLayout) findViewById(R.id.layoutHomepage);
 		RelativeLayout advanced = (RelativeLayout) findViewById(R.id.layoutAdvanced);
 
-		homepage(homepage);
 		advanced(advanced);
 	}
 
@@ -346,101 +331,6 @@ public class SettingsActivity extends Activity {
 				mEditPrefs.putBoolean(PreferenceConstants.FULL_SCREEN, isChecked);
 				mEditPrefs.commit();
 
-			}
-
-		});
-	}
-
-	public void homePicker() {
-		final AlertDialog.Builder homePicker = new AlertDialog.Builder(mActivity);
-		homePicker.setTitle(getResources().getString(R.string.title_custom_homepage));
-		final EditText getHome = new EditText(this);
-		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
-		if (!mHomepage.startsWith("about:")) {
-			getHome.setText(mHomepage);
-		} else {
-			getHome.setText("http://www.google.com");
-		}
-		homePicker.setView(getHome);
-		homePicker.setPositiveButton(getResources().getString(R.string.action_ok),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String text = getHome.getText().toString();
-						mEditPrefs.putString(PreferenceConstants.HOMEPAGE, text);
-						mEditPrefs.commit();
-						mHomepageText.setText(text);
-					}
-				});
-		homePicker.show();
-	}
-
-	public void homepage(RelativeLayout view) {
-		view.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder picker = new AlertDialog.Builder(mActivity);
-				picker.setTitle(getResources().getString(R.string.home));
-				mHomepage = mPreferences
-						.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
-				int n;
-				if (mHomepage.contains("about:home")) {
-					n = 1;
-				} else if (mHomepage.contains("about:blank")) {
-					n = 2;
-				} else if (mHomepage.contains("about:bookmarks")) {
-					n = 3;
-				} else {
-					n = 4;
-				}
-
-				picker.setSingleChoiceItems(R.array.homepage, n - 1,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-								switch (which + 1) {
-									case 1:
-										mEditPrefs.putString(PreferenceConstants.HOMEPAGE,
-												"about:home");
-										mEditPrefs.commit();
-										mHomepageText.setText(getResources().getString(
-												R.string.action_homepage));
-										break;
-									case 2:
-										mEditPrefs.putString(PreferenceConstants.HOMEPAGE,
-												"about:blank");
-										mEditPrefs.commit();
-										mHomepageText.setText(getResources().getString(
-												R.string.action_blank));
-										break;
-									case 3:
-										mEditPrefs.putString(PreferenceConstants.HOMEPAGE,
-												"about:bookmarks");
-										mEditPrefs.commit();
-										mHomepageText.setText(getResources().getString(
-												R.string.action_bookmarks));
-
-										break;
-									case 4:
-										homePicker();
-
-										break;
-								}
-							}
-						});
-				picker.setNeutralButton(getResources().getString(R.string.action_ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-				picker.show();
 			}
 
 		});
