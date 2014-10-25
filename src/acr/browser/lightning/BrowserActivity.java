@@ -10,7 +10,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
-import android.content.res.Configuration;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -32,7 +31,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Browser;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
@@ -41,7 +39,6 @@ import android.util.TypedValue;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.DecelerateInterpolator;
@@ -65,15 +62,11 @@ import java.util.*;
 public class BrowserActivity extends Activity implements BrowserController {
 
 	private DrawerLayout mDrawerLayout;
-	private RelativeLayout mDrawerLeft;
 	private LinearLayout mDrawerRight;
 	private ListView mDrawerListRight;
-	private RelativeLayout mNewTab;
-	private List<LightningView> mWebViews = new ArrayList<LightningView>();
 	private List<Integer> mIdList = new ArrayList<Integer>();
 	private LightningView mCurrentView;
-	private int mIdGenerator;
-	private LightningViewAdapter mTitleAdapter;
+	//private LightningViewAdapter mTitleAdapter;
 	private List<HistoryItem> mBookmarkList;
 	private BookmarkViewAdapter mBookmarkAdapter;
 	private AutoCompleteTextView mSearch;
@@ -136,11 +129,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		} else {
 			mIdList = new ArrayList<Integer>();
 		}
-		if (mWebViews != null) {
-			mWebViews.clear();
-		} else {
-			mWebViews = new ArrayList<LightningView>();
-		}
 
 		mBookmarkManager = new BookmarkManager(this);
 		mActivity = this;
@@ -148,8 +136,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mBrowserFrame = (FrameLayout) findViewById(R.id.content_frame);
 		mProgressBar = (ProgressBar) findViewById(R.id.activity_bar);
 		mProgressBar.setVisibility(View.GONE);
-		mNewTab = (RelativeLayout) findViewById(R.id.new_tab_button);
-		mDrawerLeft = (RelativeLayout) findViewById(R.id.left_drawer);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerRight = (LinearLayout) findViewById(R.id.right_drawer);
 		mDrawerListRight = (ListView) findViewById(R.id.right_drawer_list);
@@ -169,7 +155,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
 
-		mTitleAdapter = new LightningViewAdapter(this, R.layout.tab_list_item, mWebViews);
+		//mTitleAdapter = new LightningViewAdapter(this, R.layout.tab_list_item, Currency);
 
 		mBookmarkList = mBookmarkManager.getBookmarks(true);
 		mBookmarkAdapter = new BookmarkViewAdapter(this, R.layout.bookmark_list_item, mBookmarkList);
@@ -186,8 +172,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 		// set display options of the ActionBar
 		mActionBar.setDisplayShowTitleEnabled(false);
 		mActionBar.setDisplayShowCustomEnabled(true);
-		mActionBar.setDisplayShowHomeEnabled(true);
-		mActionBar.setDisplayHomeAsUpEnabled(true);
+		mActionBar.setDisplayShowHomeEnabled(false);
+		mActionBar.setDisplayHomeAsUpEnabled(false);
 		mActionBar.setCustomView(R.layout.search);
 
 		RelativeLayout back = (RelativeLayout) findViewById(R.id.action_back);
@@ -224,13 +210,17 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mDeleteIcon = getResources().getDrawable(R.drawable.ic_action_delete);
 		mDeleteIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
 				Utils.convertToDensityPixels(mContext, 24));
+
 		mRefreshIcon = getResources().getDrawable(R.drawable.ic_action_refresh);
 		mRefreshIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
 				Utils.convertToDensityPixels(mContext, 24));
+		
 		mCopyIcon = getResources().getDrawable(R.drawable.ic_action_copy);
 		mCopyIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
 				Utils.convertToDensityPixels(mContext, 24));
+		
 		mIcon = mRefreshIcon;
+		
 		mSearch.setCompoundDrawables(null, null, mRefreshIcon, null);
 		mSearch.setOnKeyListener(new OnKeyListener() {
 
@@ -340,30 +330,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
 
-		mNewTab.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				newTab(null, true);
-			}
-
-		});
-
-		mNewTab.setOnLongClickListener(new OnLongClickListener() {
-
-			@Override
-			public boolean onLongClick(View v) {
-				String url = mPreferences.getString(PreferenceConstants.SAVE_URL, null);
-				if (url != null) {
-					newTab(url, true);
-					Toast.makeText(mContext, R.string.deleted_tab, Toast.LENGTH_SHORT).show();
-				}
-				mEditPrefs.putString(PreferenceConstants.SAVE_URL, null).apply();
-				return true;
-			}
-
-		});
-
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_right_shadow, GravityCompat.END);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_left_shadow, GravityCompat.START);
 		initializePreferences();
@@ -379,21 +345,11 @@ public class BrowserActivity extends Activity implements BrowserController {
 		int width = getResources().getDisplayMetrics().widthPixels * 3 / 4;
 		int maxWidth = Utils.convertToDensityPixels(mContext, 300);
 		if (width > maxWidth) {
-			DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerLeft
-					.getLayoutParams();
-			params.width = maxWidth;
-			mDrawerLeft.setLayoutParams(params);
-			DrawerLayout.LayoutParams paramsRight = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerRight
-					.getLayoutParams();
+			DrawerLayout.LayoutParams paramsRight = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerRight.getLayoutParams();
 			paramsRight.width = maxWidth;
 			mDrawerRight.setLayoutParams(paramsRight);
 		} else {
-			DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerLeft
-					.getLayoutParams();
-			params.width = width;
-			mDrawerLeft.setLayoutParams(params);
-			DrawerLayout.LayoutParams paramsRight = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerRight
-					.getLayoutParams();
+			DrawerLayout.LayoutParams paramsRight = (android.support.v4.widget.DrawerLayout.LayoutParams) mDrawerRight.getLayoutParams();
 			paramsRight.width = width;
 			mDrawerRight.setLayoutParams(paramsRight);
 		}
@@ -407,9 +363,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 	}
 
 	public void restoreOrNewTab() {
-		mIdGenerator = 0;
-
 		String url = null;
+		
 		if (getIntent() != null) {
 			url = getIntent().getDataString();
 			if (url != null) {
@@ -419,25 +374,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 				}
 			}
 		}
-		if (mPreferences.getBoolean(PreferenceConstants.RESTORE_LOST_TABS, true)) {
-			String mem = mPreferences.getString(PreferenceConstants.URL_MEMORY, "");
-			mEditPrefs.putString(PreferenceConstants.URL_MEMORY, "");
-			String[] array = Utils.getArray(mem);
-			int count = 0;
-			for (int n = 0; n < array.length; n++) {
-				if (array[n].length() > 0) {
-					newTab(array[n], true);
-					count++;
-				}
-			}
-			if (url != null) {
-				newTab(url, true);
-			} else if (count == 0) {
-				newTab(null, true);
-			}
-		} else {
-			newTab(url, true);
-		}
+
+		newTab(url, true);
 	}
 
 	public void initializePreferences() {
@@ -445,14 +383,11 @@ public class BrowserActivity extends Activity implements BrowserController {
 			mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
 		}
 		
-		mFullScreen = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
-		
-		if (mPreferences.getBoolean(PreferenceConstants.HIDE_STATUS_BAR, false)) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		} else {
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
+		//Habilita que se ocule la barra superior del navegador
+		mFullScreen = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, true);
+
+		//Oculta la barra superior de Android
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		mSearchText = Constants.GOOGLE_SEARCH;
 
@@ -727,27 +662,10 @@ public class BrowserActivity extends Activity implements BrowserController {
 		// don't delete the tab because the browser will close and mess stuff up
 	}
 
-	private void selectItem(final int position) {
-		// update selected item and title, then close the drawer
-
-		showTab(mWebViews.get(position));
-
-	}
-
-
 	protected synchronized void newTab(String url, boolean show) {
 		mIsNewIntent = false;
 		LightningView startingTab = new LightningView(mActivity, url);
-		if (mIdGenerator == 0) {
-			startingTab.resumeTimers();
-		}
-		mIdList.add(mIdGenerator);
-		mIdGenerator++;
-		mWebViews.add(startingTab);
 
-		Drawable icon = writeOnDrawable(mWebViews.size());
-		mActionBar.setIcon(icon);
-		mTitleAdapter.notifyDataSetChanged();
 		if (show) {
 			showTab(startingTab);
 		}
@@ -774,14 +692,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 				Log.i(Constants.TAG, "Cookies Cleared");
 
 			}
+			mCurrentView.onDestroy();
 			mCurrentView = null;
-			for (int n = 0; n < mWebViews.size(); n++) {
-				if (mWebViews.get(n) != null) {
-					mWebViews.get(n).onDestroy();
-				}
-			}
-			mWebViews.clear();
-			mTitleAdapter.notifyDataSetChanged();
 			finish();
 		}
 		return true;
@@ -818,9 +730,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		if (!mActionBar.isShowing()) {
 			mActionBar.show();
 		}
-		if (mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
-			mDrawerLayout.closeDrawer(mDrawerLeft);
-		} else if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
+		if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
 			mDrawerLayout.closeDrawer(mDrawerRight);
 		} else {
 			if (mCurrentView != null) {
@@ -856,16 +766,12 @@ public class BrowserActivity extends Activity implements BrowserController {
 	}
 
 	public void saveOpenTabs() {
-		if (mPreferences.getBoolean(PreferenceConstants.RESTORE_LOST_TABS, true)) {
-			String s = "";
-			for (int n = 0; n < mWebViews.size(); n++) {
-				if (mWebViews.get(n).getUrl() != null) {
-					s = s + mWebViews.get(n).getUrl() + "|$|SEPARATOR|$|";
-				}
-			}
-			mEditPrefs.putString(PreferenceConstants.URL_MEMORY, s);
-			mEditPrefs.commit();
+		String s = "";
+		if (mCurrentView != null) {
+			s = mCurrentView.getUrl();
 		}
+		mEditPrefs.putString(PreferenceConstants.URL_MEMORY, s);
+		mEditPrefs.commit();
 	}
 
 	@Override
@@ -909,14 +815,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 			initialize();
 		}
 		initializePreferences();
-		if (mWebViews != null) {
-			for (int n = 0; n < mWebViews.size(); n++) {
-				if (mWebViews.get(n) != null) {
-					mWebViews.get(n).initializePreferences(this);
-				} else {
-					mWebViews.remove(n);
-				}
-			}
+		
+		if (mCurrentView != null) {
+			mCurrentView.initializePreferences(this);
 		} else {
 			initialize();
 		}
@@ -1012,7 +913,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		return new BitmapDrawable(getResources(), bm);
 	}
-
+/*
 	public class LightningViewAdapter extends ArrayAdapter<LightningView> {
 
 		Context context;
@@ -1085,7 +986,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			ImageView exit;
 		}
 	}
-
+*/
 	public class BookmarkViewAdapter extends ArrayAdapter<HistoryItem> {
 
 		Context context;
@@ -1416,9 +1317,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 	 * helper function that opens the bookmark drawer
 	 */
 	private void openBookmarks() {
-		if (mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
-			mDrawerLayout.closeDrawers();
-		}
 		mDrawerLayout.openDrawer(mDrawerRight);
 	}
 
@@ -1454,7 +1352,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	@Override
 	public void update() {
-		mTitleAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -1871,7 +1768,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 	 * This method lets the search bar know that the page is currently loading
 	 * and that it should display the stop icon to indicate to the user that
 	 * pressing it stops the page from loading
-	 */
+	 */  
 	public void setIsLoading() {
 		if (!mSearch.hasFocus()) {
 			mIcon = mDeleteIcon;

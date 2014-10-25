@@ -84,22 +84,17 @@ public class SettingsActivity extends Activity {
 		}
 
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
-		if (mPreferences.getBoolean(PreferenceConstants.HIDE_STATUS_BAR, false)) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
+
+		//Oculta la barra superior de Android
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 
 		mEditPrefs = mPreferences.edit();
-
-		// initialize UI
-		RelativeLayout layoutBlockAds = (RelativeLayout) findViewById(R.id.layoutAdBlock);
-	
 
 		if (API >= 19) {
 			mEditPrefs.putInt(PreferenceConstants.ADOBE_FLASH_SUPPORT, 0);
 			mEditPrefs.commit();
 		}
-		boolean fullScreenBool = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
 		
 		String code = "HOLO";
 
@@ -115,8 +110,7 @@ public class SettingsActivity extends Activity {
 		version.setText(code + "");
 
 
-		RelativeLayout r4, licenses;
-		r4 = (RelativeLayout) findViewById(R.id.setR4);
+		RelativeLayout licenses;
 		licenses = (RelativeLayout) findViewById(R.id.layoutLicense);
 
 		licenses.setOnClickListener(new OnClickListener() {
@@ -131,17 +125,6 @@ public class SettingsActivity extends Activity {
 
 		});
 
-		Switch fullScreen = new Switch(this);
-		Switch adblock = new Switch(this);
-
-		r4.addView(adblock);
-		fullScreen.setChecked(fullScreenBool);
-
-		adblock.setChecked(mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false));
-
-		initSwitch(fullScreen, adblock);
-		clickListenerForSwitches(layoutBlockAds, adblock);
-
 		RelativeLayout r8, r15, rClearCache;
 
 		r8 = (RelativeLayout) findViewById(R.id.rClearHistory);
@@ -153,42 +136,6 @@ public class SettingsActivity extends Activity {
 		rClearCache(rClearCache);
 
 		messageHandler = new MessageHandler(mContext);
-	}
-
-
-	public void clickListenerForSwitches(RelativeLayout layoutBlockAds, final Switch adblock) {
-		layoutBlockAds.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				adblock.setChecked(!adblock.isChecked());
-			}
-
-		});
-
-	}
-
-	public void initSwitch(Switch fullscreen, Switch adblock) {
-		adblock.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.BLOCK_ADS, isChecked);
-				mEditPrefs.commit();
-			}
-
-		});
-
-		fullscreen.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mEditPrefs.putBoolean(PreferenceConstants.FULL_SCREEN, isChecked);
-				mEditPrefs.commit();
-
-			}
-
-		});
 	}
 
 	public void initCheckBox(CheckBox location, CheckBox fullscreen, CheckBox flash) {

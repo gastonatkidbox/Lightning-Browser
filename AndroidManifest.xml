@@ -42,7 +42,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/LightTheme" >
+            android:theme="@style/CeibalTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

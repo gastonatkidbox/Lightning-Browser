@@ -154,12 +154,13 @@ public class LightningView {
 	public String getHomepage() {
 		String home;
 	
+		HomepageVariables hp = new HomepageVariables(getActivity());
 		// GOOGLE_SEARCH;
-		home = HomepageVariables.HEAD;
+		home = hp.getHEAD();
 		home = home + "file:///android_asset/google.png";
-		home = home + HomepageVariables.MIDDLE;
+		home = home + hp.getMIDDLE();
 		home = home + Constants.GOOGLE_SEARCH;
-		home = home + HomepageVariables.END;
+		home = home + hp.getEND();
 
 		File homepage = new File(mActivity.getFilesDir(), "homepage.html");
 		try {

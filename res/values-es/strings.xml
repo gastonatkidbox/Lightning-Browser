@@ -83,6 +83,7 @@
     <string name="dialog_reflow_warning">Lo lamentamos, Google ha realizado algunos cambios y el Text Reflow ha dejado de funcionar en Android 4.4+</string>
     <string name="title_clear_history">Borrar Historial</string>
     <string name="title_clear_cookies">Borrar Cookies</string>
+    <string name="clear_cache">Borrar caché</string>
     <string name="dialog_history">¿Quieres borrar el Historial?</string>
     <string name="dialog_cookies">¿Quieres borrar todas las Cookies?</string>
     <string name="action_yes">Sí</string>
@@ -112,4 +113,5 @@
     <string name="download_sdcard_busy_dlg_msg" >El almacenamiento está ocupado. Para permitir las descargar, Desactiva el almacenamiento USB desde el área de notificación.</string>
     <string name="folder_default">Por Defecto</string>
     <string name="folder_custom">Personalizado</string>
+    <string name="licenses">Licencias de código abierto</string>
 </resources>
