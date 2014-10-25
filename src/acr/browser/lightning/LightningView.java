@@ -153,92 +153,12 @@ public class LightningView {
 
 	public String getHomepage() {
 		String home;
+	
+		// GOOGLE_SEARCH;
 		home = HomepageVariables.HEAD;
-		switch (mPreferences.getInt(PreferenceConstants.SEARCH, 1)) {
-			case 0:
-				// CUSTOM SEARCH
-				home = home + "file:///android_asset/lightning.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home
-						+ mPreferences.getString(PreferenceConstants.SEARCH_URL,
-								Constants.GOOGLE_SEARCH);
-				break;
-			case 1:
-				// GOOGLE_SEARCH;
-				home = home + "file:///android_asset/google.png";
-				// + "https://www.google.com/images/srpr/logo11w.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.GOOGLE_SEARCH;
-				break;
-			case 2:
-				// ANDROID SEARCH;
-				home = home + "file:///android_asset/lightning.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.ANDROID_SEARCH;
-				break;
-			case 3:
-				// BING_SEARCH;
-				home = home + "file:///android_asset/bing.png";
-				// +
-				// "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Bing_logo_%282013%29.svg/500px-Bing_logo_%282013%29.svg.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.BING_SEARCH;
-				break;
-			case 4:
-				// YAHOO_SEARCH;
-				home = home + "file:///android_asset/yahoo.png";
-				// +
-				// "http://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Yahoo%21_logo.svg/799px-Yahoo%21_logo.svg.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.YAHOO_SEARCH;
-				break;
-			case 5:
-				// STARTPAGE_SEARCH;
-				home = home + "file:///android_asset/startpage.png";
-				// + "https://startpage.com/graphics/startp_logo.gif";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.STARTPAGE_SEARCH;
-				break;
-			case 6:
-				// STARTPAGE_MOBILE
-				home = home + "file:///android_asset/startpage.png";
-				// + "https://startpage.com/graphics/startp_logo.gif";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.STARTPAGE_MOBILE_SEARCH;
-			case 7:
-				// DUCK_SEARCH;
-				home = home + "file:///android_asset/duckduckgo.png";
-				// +
-				// "https://duckduckgo.com/assets/logo_homepage.normal.v101.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.DUCK_SEARCH;
-				break;
-			case 8:
-				// DUCK_LITE_SEARCH;
-				home = home + "file:///android_asset/duckduckgo.png";
-				// +
-				// "https://duckduckgo.com/assets/logo_homepage.normal.v101.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.DUCK_LITE_SEARCH;
-				break;
-			case 9:
-				// BAIDU_SEARCH;
-				home = home + "file:///android_asset/baidu.png";
-				// + "http://www.baidu.com/img/bdlogo.gif";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.BAIDU_SEARCH;
-				break;
-			case 10:
-				// YANDEX_SEARCH;
-				home = home + "file:///android_asset/yandex.png";
-				// +
-				// "http://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Yandex.svg/600px-Yandex.svg.png";
-				home = home + HomepageVariables.MIDDLE;
-				home = home + Constants.YANDEX_SEARCH;
-				break;
-
-		}
-
+		home = home + "file:///android_asset/google.png";
+		home = home + HomepageVariables.MIDDLE;
+		home = home + Constants.GOOGLE_SEARCH;
 		home = home + HomepageVariables.END;
 
 		File homepage = new File(mActivity.getFilesDir(), "homepage.html");

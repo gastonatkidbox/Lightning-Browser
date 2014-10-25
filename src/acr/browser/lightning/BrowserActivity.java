@@ -65,7 +65,6 @@ import java.util.*;
 public class BrowserActivity extends Activity implements BrowserController {
 
 	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerListLeft;
 	private RelativeLayout mDrawerLeft;
 	private LinearLayout mDrawerRight;
 	private ListView mDrawerListRight;
@@ -110,7 +109,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private int mActionBarSizeDp;
 	private int mNumberIconColor;
 	private String mHomepage;
-	private boolean mIsNewIntent = false;
+	private boolean mIsNewIntent;
 	private VideoView mVideoView;
 	private static SearchAdapter mSearchAdapter;
 	private static LayoutParams mMatchParent = new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -157,9 +156,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mNewTab = (RelativeLayout) findViewById(R.id.new_tab_button);
 		mDrawerLeft = (RelativeLayout) findViewById(R.id.left_drawer);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerListLeft = (ListView) findViewById(R.id.left_drawer_list);
-		mDrawerListLeft.setDivider(null);
-		mDrawerListLeft.setDividerHeight(0);
 		mDrawerRight = (LinearLayout) findViewById(R.id.right_drawer);
 		mDrawerListRight = (ListView) findViewById(R.id.right_drawer_list);
 		mDrawerListRight.setDivider(null);
@@ -179,9 +175,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
 
 		mTitleAdapter = new LightningViewAdapter(this, R.layout.tab_list_item, mWebViews);
-		mDrawerListLeft.setAdapter(mTitleAdapter);
-		mDrawerListLeft.setOnItemClickListener(new DrawerItemClickListener());
-		mDrawerListLeft.setOnItemLongClickListener(new DrawerItemLongClickListener());
 
 		mBookmarkList = mBookmarkManager.getBookmarks(true);
 		mBookmarkAdapter = new BookmarkViewAdapter(this, R.layout.bookmark_list_item, mBookmarkList);
@@ -210,11 +203,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 				@Override
 				public void onClick(View v) {
 					if (mCurrentView != null) {
-						if (mCurrentView.canGoBack()) {
-							mCurrentView.goBack();
-						} else {
-							deleteTab(mDrawerListLeft.getCheckedItemPosition());
-						}
+						mCurrentView.goBack();
 					}
 				}
 
@@ -491,7 +480,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 		if (mPreferences == null) {
 			mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
 		}
+		
 		mFullScreen = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
+		
 		if (mPreferences.getBoolean(PreferenceConstants.HIDE_STATUS_BAR, false)) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -499,46 +490,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 
-		switch (mPreferences.getInt(PreferenceConstants.SEARCH, 1)) {
-			case 0:
-				mSearchText = mPreferences.getString(PreferenceConstants.SEARCH_URL,
-						Constants.GOOGLE_SEARCH);
-				if (!mSearchText.startsWith(Constants.HTTP)
-						&& !mSearchText.startsWith(Constants.HTTPS)) {
-					mSearchText = Constants.GOOGLE_SEARCH;
-				}
-				break;
-			case 1:
-				mSearchText = Constants.GOOGLE_SEARCH;
-				break;
-			case 2:
-				mSearchText = Constants.ANDROID_SEARCH;
-				break;
-			case 3:
-				mSearchText = Constants.BING_SEARCH;
-				break;
-			case 4:
-				mSearchText = Constants.YAHOO_SEARCH;
-				break;
-			case 5:
-				mSearchText = Constants.STARTPAGE_SEARCH;
-				break;
-			case 6:
-				mSearchText = Constants.STARTPAGE_MOBILE_SEARCH;
-				break;
-			case 7:
-				mSearchText = Constants.DUCK_SEARCH;
-				break;
-			case 8:
-				mSearchText = Constants.DUCK_LITE_SEARCH;
-				break;
-			case 9:
-				mSearchText = Constants.BAIDU_SEARCH;
-				break;
-			case 10:
-				mSearchText = Constants.YANDEX_SEARCH;
-				break;
-		}
+		mSearchText = Constants.GOOGLE_SEARCH;
 
 		updateCookiePreference();
 	}
@@ -637,54 +589,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mBookmarkAdapter.clear();
 		mBookmarkAdapter.addAll(mBookmarkList);
 		mBookmarkAdapter.notifyDataSetChanged();
-	}
-
-	/**
-	 * method that shows a dialog asking what string the user wishes to search
-	 * for. It highlights the text entered.
-	 */
-	private void findInPage() {
-		final AlertDialog.Builder finder = new AlertDialog.Builder(mActivity);
-		finder.setTitle(getResources().getString(R.string.action_find));
-		final EditText getHome = new EditText(this);
-		getHome.setHint(getResources().getString(R.string.search_hint));
-		finder.setView(getHome);
-		finder.setPositiveButton(getResources().getString(R.string.search_hint),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String text = getHome.getText().toString();
-						if (mCurrentView != null) {
-							mCurrentView.find(text);
-						}
-					}
-				});
-		finder.show();
-	}
-
-	/**
-	 * The click listener for ListView in the navigation drawer
-	 */
-	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			mIsNewIntent = false;
-			selectItem(position);
-		}
-	}
-
-	/**
-	 * long click listener for Navigation Drawer
-	 */
-	private class DrawerItemLongClickListener implements ListView.OnItemLongClickListener {
-
-		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-			deleteTab(position);
-			return false;
-		}
 	}
 
 	private class BookmarkItemClickListener implements ListView.OnItemClickListener {
@@ -920,97 +824,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mActionBar.setIcon(icon);
 		mTitleAdapter.notifyDataSetChanged();
 		if (show) {
-			mDrawerListLeft.setItemChecked(mWebViews.size() - 1, true);
 			showTab(startingTab);
 		}
-	}
-
-	private synchronized void deleteTab(int position) {
-		if (position >= mWebViews.size()) {
-			return;
-		}
-
-		int current = mDrawerListLeft.getCheckedItemPosition();
-		LightningView reference = mWebViews.get(position);
-		if (reference == null) {
-			return;
-		}
-		if (reference.getUrl() != null && !reference.getUrl().startsWith(Constants.FILE)) {
-			mEditPrefs.putString(PreferenceConstants.SAVE_URL, reference.getUrl()).apply();
-		}
-		boolean isShown = reference.isShown();
-		if (current > position) {
-			mIdList.remove(position);
-			mWebViews.remove(position);
-			mDrawerListLeft.setItemChecked(current - 1, true);
-			reference.onDestroy();
-		} else if (mWebViews.size() > position + 1) {
-			mIdList.remove(position);
-			if (current == position) {
-				showTab(mWebViews.get(position + 1));
-				mWebViews.remove(position);
-				mDrawerListLeft.setItemChecked(position, true);
-			} else {
-				mWebViews.remove(position);
-			}
-
-			reference.onDestroy();
-		} else if (mWebViews.size() > 1) {
-			mIdList.remove(position);
-			if (current == position) {
-				showTab(mWebViews.get(position - 1));
-				mWebViews.remove(position);
-				mDrawerListLeft.setItemChecked(position - 1, true);
-			} else {
-				mWebViews.remove(position);
-			}
-
-			reference.onDestroy();
-		} else {
-			if (mCurrentView.getUrl() == null || mCurrentView.getUrl().startsWith(Constants.FILE)
-					|| mCurrentView.getUrl().equals(mHomepage)) {
-				closeActivity();
-			} else {
-				mIdList.remove(position);
-				mWebViews.remove(position);
-				if (mPreferences.getBoolean(PreferenceConstants.CLEAR_CACHE_EXIT, false)
-						&& mCurrentView != null && !isIncognito()) {
-					mCurrentView.clearCache(true);
-					Log.i(Constants.TAG, "Cache Cleared");
-
-				}
-				if (mPreferences.getBoolean(PreferenceConstants.CLEAR_HISTORY_EXIT, false)
-						&& !isIncognito()) {
-					clearHistory();
-					Log.i(Constants.TAG, "History Cleared");
-
-				}
-				if (mPreferences.getBoolean(PreferenceConstants.CLEAR_COOKIES_EXIT, false)
-						&& !isIncognito()) {
-					clearCookies();
-					Log.i(Constants.TAG, "Cookies Cleared");
-
-				}
-				if (reference != null) {
-					reference.pauseTimers();
-					reference.onDestroy();
-				}
-				mCurrentView = null;
-				mTitleAdapter.notifyDataSetChanged();
-				finish();
-
-			}
-		}
-		mTitleAdapter.notifyDataSetChanged();
-		Drawable icon = writeOnDrawable(mWebViews.size());
-		mActionBar.setIcon(icon);
-
-		if (mIsNewIntent && isShown) {
-			mIsNewIntent = false;
-			closeActivity();
-		}
-
-		Log.i(Constants.TAG, "deleted tab");
 	}
 
 	@Override
@@ -1091,8 +906,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 					} else {
 						mCurrentView.goBack();
 					}
-				} else {
-					deleteTab(mDrawerListLeft.getCheckedItemPosition());
 				}
 			} else {
 				Log.e(Constants.TAG, "So madness. Much confusion. Why happen.");
@@ -1308,14 +1121,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 				holder = (LightningViewHolder) row.getTag();
 			}
 
-			holder.exit.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View view) {
-					deleteTab(position);
-				}
-
-			});
 
 			LightningView web = data.get(position);
 			holder.txtTitle.setText(web.getTitle());
