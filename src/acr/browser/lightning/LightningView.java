@@ -961,7 +961,7 @@ public class LightningView {
 			mDefaultIcon = BitmapFactory.decodeResource(context.getResources(),
 					R.drawable.ic_webpage);
 			mFavicon = mDefaultIcon;
-			mTitle = mActivity.getString(R.string.action_new_tab);
+			mTitle = "";
 		}
 
 		public void setFavicon(Bitmap favicon) {

@@ -69,7 +69,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private LinearLayout mDrawerRight;
 	private ListView mDrawerListRight;
 	private RelativeLayout mNewTab;
-	private ActionBarDrawerToggle mDrawerToggle;
 	private List<LightningView> mWebViews = new ArrayList<LightningView>();
 	private List<Integer> mIdList = new ArrayList<Integer>();
 	private LightningView mCurrentView;
@@ -142,12 +141,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 		} else {
 			mWebViews = new ArrayList<LightningView>();
 		}
+
 		mBookmarkManager = new BookmarkManager(this);
-		if (!mPreferences.getBoolean(PreferenceConstants.OLD_BOOKMARKS_IMPORTED, false)) {
-			List<HistoryItem> old = Utils.getOldBookmarks(this);
-			mBookmarkManager.addBookmarkList(old);
-			mEditPrefs.putBoolean(PreferenceConstants.OLD_BOOKMARKS_IMPORTED, true).apply();
-		}
 		mActivity = this;
 		mClickHandler = new ClickHandler(this);
 		mBrowserFrame = (FrameLayout) findViewById(R.id.content_frame);
@@ -344,36 +339,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		initialize.run();
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
-		mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
-		mDrawerLayout, /* DrawerLayout object */
-		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
-		R.string.drawer_open, /* "open drawer" description for accessibility */
-		R.string.drawer_close /* "close drawer" description for accessibility */
-		) {
-			@Override
-			public void onDrawerClosed(View view) {
-				super.onDrawerClosed(view);
-				if (view.equals(mDrawerLeft)) {
-					mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, mDrawerRight);
-				} else if (view.equals(mDrawerRight)) {
-					mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, mDrawerLeft);
-				}
-			}
-
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-				if (drawerView.equals(mDrawerLeft)) {
-					mDrawerLayout.closeDrawer(mDrawerRight);
-					mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-							mDrawerRight);
-				} else if (drawerView.equals(mDrawerRight)) {
-					mDrawerLayout.closeDrawer(mDrawerLeft);
-					mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, mDrawerLeft);
-				}
-			}
-
-		};
 
 		mNewTab.setOnClickListener(new OnClickListener() {
 
@@ -399,7 +364,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		});
 
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_right_shadow, GravityCompat.END);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_left_shadow, GravityCompat.START);
 		initializePreferences();
@@ -519,25 +483,12 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// The action bar home/up action should open or close the drawer.
-		// ActionBarDrawerToggle will take care of this.
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
-			if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
-				mDrawerLayout.closeDrawer(mDrawerRight);
-				mDrawerLayout.openDrawer(mDrawerLeft);
-			} else if (mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
-				mDrawerLayout.closeDrawer(mDrawerLeft);
-			}
-			mDrawerToggle.syncState();
-			return true;
-		}
 		// Handle action buttons
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
 					mDrawerLayout.closeDrawer(mDrawerRight);
 				}
-				mDrawerToggle.syncState();
 				return true;
 			case R.id.action_back:
 				if (mCurrentView != null) {
@@ -619,14 +570,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 			builder.setTitle(mContext.getResources().getString(R.string.action_bookmarks));
 			builder.setMessage(getResources().getString(R.string.dialog_bookmark))
 					.setCancelable(true)
-					.setPositiveButton(getResources().getString(R.string.action_new_tab),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int id) {
-									newTab(mBookmarkList.get(position).getUrl(), false);
-									mDrawerLayout.closeDrawers();
-								}
-							})
 					.setNegativeButton(getResources().getString(R.string.action_delete),
 							new DialogInterface.OnClickListener() {
 
@@ -791,24 +734,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	}
 
-	/**
-	 * When using the ActionBarDrawerToggle, you must call it during
-	 * onPostCreate() and onConfigurationChanged()...
-	 */
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		// Sync the toggle state after onRestoreInstanceState has occurred.
-		mDrawerToggle.syncState();
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		// Pass any configuration change to the drawer toggls
-		mDrawerToggle.onConfigurationChanged(newConfig);
-	}
 
 	protected synchronized void newTab(String url, boolean show) {
 		mIsNewIntent = false;
@@ -1494,7 +1419,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		if (mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
 			mDrawerLayout.closeDrawers();
 		}
-		mDrawerToggle.syncState();
 		mDrawerLayout.openDrawer(mDrawerRight);
 	}
 
@@ -1804,8 +1728,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 					AlertDialog.Builder builder = new AlertDialog.Builder(mActivity); // dialog
 					builder.setTitle(url.replace(Constants.HTTP, ""))
 							.setMessage(getResources().getString(R.string.dialog_image))
-							.setPositiveButton(getResources().getString(R.string.action_new_tab),
-									dialogClickListener)
 							.setNegativeButton(getResources().getString(R.string.action_open),
 									dialogClickListener)
 							.setNeutralButton(getResources().getString(R.string.action_download),
@@ -1836,8 +1758,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 					AlertDialog.Builder builder = new AlertDialog.Builder(mActivity); // dialog
 					builder.setTitle(url)
 							.setMessage(getResources().getString(R.string.dialog_link))
-							.setPositiveButton(getResources().getString(R.string.action_new_tab),
-									dialogClickListener)
 							.setNegativeButton(getResources().getString(R.string.action_open),
 									dialogClickListener)
 							.setNeutralButton(getResources().getString(R.string.action_copy),
@@ -1869,8 +1789,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mActivity); // dialog
 				builder.setTitle(url)
 						.setMessage(getResources().getString(R.string.dialog_link))
-						.setPositiveButton(getResources().getString(R.string.action_new_tab),
-								dialogClickListener)
 						.setNegativeButton(getResources().getString(R.string.action_open),
 								dialogClickListener)
 						.setNeutralButton(getResources().getString(R.string.action_copy),
@@ -1906,8 +1824,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 					AlertDialog.Builder builder = new AlertDialog.Builder(mActivity); // dialog
 					builder.setTitle(newUrl.replace(Constants.HTTP, ""))
 							.setMessage(getResources().getString(R.string.dialog_image))
-							.setPositiveButton(getResources().getString(R.string.action_new_tab),
-									dialogClickListener)
 							.setNegativeButton(getResources().getString(R.string.action_open),
 									dialogClickListener)
 							.setNeutralButton(getResources().getString(R.string.action_download),
@@ -1939,8 +1855,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 					AlertDialog.Builder builder = new AlertDialog.Builder(mActivity); // dialog
 					builder.setTitle(newUrl)
 							.setMessage(getResources().getString(R.string.dialog_link))
-							.setPositiveButton(getResources().getString(R.string.action_new_tab),
-									dialogClickListener)
 							.setNegativeButton(getResources().getString(R.string.action_open),
 									dialogClickListener)
 							.setNeutralButton(getResources().getString(R.string.action_copy),
