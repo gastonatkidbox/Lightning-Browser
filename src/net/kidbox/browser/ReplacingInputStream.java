@@ -1,4 +1,4 @@
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

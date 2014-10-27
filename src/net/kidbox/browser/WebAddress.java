@@ -1,7 +1,7 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import java.util.Locale;
 import java.util.regex.Matcher;

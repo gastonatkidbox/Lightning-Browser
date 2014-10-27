@@ -1,4 +1,4 @@
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import android.content.Context;
 import android.content.SharedPreferences;

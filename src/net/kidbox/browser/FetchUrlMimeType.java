@@ -1,7 +1,7 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import android.app.DownloadManager;
 import android.content.Context;

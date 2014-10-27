@@ -1,4 +1,4 @@
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import android.app.Application;
 import android.content.Context;

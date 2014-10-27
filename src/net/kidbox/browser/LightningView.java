@@ -2,8 +2,9 @@
  * Copyright 2014 A.C.R. Development
  */
 
-package acr.browser.lightning;
+package net.kidbox.browser;
 
+import net.kidbox.browser.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,6 +31,7 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.PluginState;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import org.apache.http.util.ByteArrayBuffer;
 
 import java.io.*;

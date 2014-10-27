@@ -2,14 +2,16 @@
  * Copyright 2014 A.C.R. Development
  */
 
-package acr.browser.lightning;
+package net.kidbox.browser;
 
+import net.kidbox.browser.R;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
+import android.content.res.Configuration;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -117,6 +119,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private Drawable mGoIcon;
 	private ImageButton closeButton;
 	private ImageButton homeButton;
+	private ImageButton closeKeyboard;
+	private View main;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -426,6 +430,35 @@ public class BrowserActivity extends Activity implements BrowserController {
 		setPreviousButtonEnabled(mCurrentView.canGoBack());
 		setNextButtonEnabled(mCurrentView.canGoForward());
 
+		main = (View) findViewById(R.id.main_layout);
+		main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			
+			@Override
+			public void onGlobalLayout() {
+				//TODO: Hay un conflicto entre las apps a pantalla completa y el resize, por eso el
+				//layout no se ajusta cuando se muestra el teclado.
+		        int heightDiff = main.getRootView().getHeight() - main.getHeight();
+		        if (heightDiff > 200) { // if more than 100 pixels, its probably a keyboard...
+		        	closeKeyboard.setVisibility(View.VISIBLE);
+		        }else{
+		        	closeKeyboard.setVisibility(View.GONE);
+		        }
+		    }
+		});
+
+		closeKeyboard = (ImageButton) findViewById(R.id.browser_close_keyboard);
+		closeKeyboard.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				closeKeyboard();
+			}
+		});
+
+	}
+	
+	private void closeKeyboard() {
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(main.getWindowToken(), 0);
 	}
 	
 	private void setPreviousButtonEnabled(boolean enabled){
@@ -502,7 +535,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mFullScreen = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, true);
 
 		//Oculta la barra superior de Android
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		mSearchText = Constants.GOOGLE_SEARCH;
 

@@ -1,8 +1,9 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package acr.browser.lightning;
+package net.kidbox.browser;
 
+import net.kidbox.browser.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;

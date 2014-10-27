@@ -1,4 +1,4 @@
-package acr.browser.lightning;
+package net.kidbox.browser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.kidbox.browser.R;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Environment;

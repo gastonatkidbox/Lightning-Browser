@@ -1,8 +1,9 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package acr.browser.lightning;
+package net.kidbox.browser;
 
+import net.kidbox.browser.R;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;

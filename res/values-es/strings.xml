@@ -8,8 +8,8 @@
     <string name="action_new_tab">Nueva Pestaña</string>
     <string name="action_share">Compartir</string>
     <string name="action_history">Historial</string>
-    <string name="action_bookmarks">Marcadores</string>
-    <string name="action_add_bookmark">Añadir Marcador</string>
+    <string name="action_bookmarks">Favoritos</string>
+    <string name="action_add_bookmark">Añadir Favorito</string>
     <string name="action_copy">Copiar enlace</string>
     <string name="action_forward">Adelante</string>
     <string name="google">Google</string>
@@ -43,7 +43,7 @@
     <string name="block">Bloquear imágenes</string>
     <string name="window">Permitir a los sitios abrir nuesvas ventanas</string>
     <string name="cookies">Habilitar cookies</string>
-    <string name="importbookmarks">Importar marcadores</string>
+    <string name="importbookmarks">Importar favoritos</string>
     <string name="size">Tamaño de la tipografía</string>
     <string name="recommended">(Recomendado)</string>
     <string name="search">Motor de búsquedas</string>
@@ -61,7 +61,7 @@
     <string name="action_open">Abrir</string>
     <string name="dialog_link">¿Qué quieres hacer con este enlace?</string>
     <string name="dialog_title_share">Compartir esta página</string>
-    <string name="dialog_bookmark">¿Qué quieres hacer con este marcador?</string>
+    <string name="dialog_bookmark">¿Qué quieres hacer con este favorito?</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_blank">Página en Blanco</string>
     <string name="agent_default">Por Defecto</string>
@@ -95,10 +95,10 @@
     <string name="size_small">Pequeño</string>
     <string name="size_smallest">Más Pequeño</string>
     <string name="title_error">Error</string>
-    <string name="dialog_import_error">No se ha detectado buscador del cuál importar marcadores.</string>
+    <string name="dialog_import_error">No se ha detectado buscador del cuál importar favoritos.</string>
     <string name="hint_title">Título</string>
     <string name="hint_url">URL</string>
-    <string name="title_edit_bookmark">Editar Marcador</string>
+    <string name="title_edit_bookmark">Editar Favorito</string>
     <string name="action_edit">Editar</string>
     <string name="action_incognito">Nueva pestaña privada</string>
     <string name="hello_world">¡Hola Mundo!</string>
