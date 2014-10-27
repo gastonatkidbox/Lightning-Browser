@@ -13,6 +13,7 @@
         <item name="arrowForwardDrawable">@drawable/ic_action_forward</item>
         <item name="android:actionBarStyle">@style/CeibalActionBar</item>
 		<item name="android:icon">@android:color/transparent</item>
+		<item name="android:actionBarSize">80dp</item>
     </style>
     
     <style name="CeibalActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid">

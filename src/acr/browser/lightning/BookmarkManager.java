@@ -40,6 +40,14 @@ public class BookmarkManager {
 		mBookmarkMap = getBookmarkUrls();
 	}
 
+	public synchronized boolean hasBookmark(String url){
+		if (mBookmarkMap != null && url != null) {
+			return mBookmarkMap.containsKey(url);
+		}else{
+			return false;
+		}
+	}
+	
 	/**
 	 * This method adds the the HistoryItem item to permanent bookmark storage
 	 * 

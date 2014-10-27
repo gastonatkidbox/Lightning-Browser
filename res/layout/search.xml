@@ -2,34 +2,222 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="7dp"
-    android:layout_marginLeft="5dp"
-    android:layout_marginRight="5dp"
-    android:layout_marginTop="8dp"
     android:background="@drawable/card_bg"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    android:gravity="center" >
+    android:gravity="center"
+    android:orientation="vertical" >
 
-    <AutoCompleteTextView
-        android:id="@+id/search"
+    <LinearLayout
+        android:id="@+id/top_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:gravity="left|center_vertical"
-        android:hint="@+string/search_hint"
-        android:imeOptions="actionGo"
-        android:inputType="textUri"
-        android:paddingBottom="1dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="5dp"
-        android:paddingTop="1dp"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:textColor="@color/gray_dark"
-        android:textCursorDrawable="@null" >
-    </AutoCompleteTextView>
+        android:layout_height="88dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/browser_top_bar_background"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/top_left_bar_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dp"
+                android:gravity="left" >
+
+                <ImageButton
+                    android:id="@+id/browser_previous_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:padding="0dp"
+                    android:src="@drawable/browser_back_disabled" />
+
+                <ImageButton
+                    android:id="@+id/browser_next_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:padding="0dp"
+                    android:src="@drawable/browser_forward_disabled" />
+
+                <ImageButton
+                    android:id="@+id/browser_home_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:padding="0dp"
+                    android:src="@drawable/browser_home_up" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/top_right_bar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/top_left_bar_layout"
+                android:gravity="right" >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/top_right_right_bar_layout" >
+
+                        <FrameLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp" >
+
+                            <ProgressBar
+                                android:id="@+id/browser_load_progress"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="fill_parent"
+                                android:layout_height="64dp"
+                                android:indeterminate="false"
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/browser_progress_not_loading_style"
+                                android:visibility="visible" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="64dp"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp" >
+
+                            <FrameLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1" >
+
+                                <ImageView
+                                    android:id="@+id/browser_https_indicator"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="0dp"
+                                    android:src="@drawable/browser_padlock"
+                                    android:visibility="gone" />
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/search"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="64dp"
+                                    android:autoLink="none"
+                                    android:background="@null"
+                                    android:gravity="left|center_vertical"
+                                    android:hint="@+string/search_hint"
+                                    android:imeOptions="actionGo"
+                                    android:inputType="textUri"
+                                    android:linksClickable="false"
+                                    android:maxLength="1024"
+                                    android:maxLines="1"
+                                    android:paddingBottom="0dp"
+                                    android:paddingLeft="15dp"
+                                    android:paddingRight="0dp"
+                                    android:paddingTop="0dp"
+                                    android:scrollbars="none"
+                                    android:selectAllOnFocus="true"
+                                    android:singleLine="true"
+                                    android:textColor="@color/gray_dark"
+                                    android:textColorHighlight="@android:color/transparent"
+                                    android:textColorLink="@android:color/transparent"
+                                    android:textCursorDrawable="@null"
+                                    android:textSize="25sp" >
+                                </AutoCompleteTextView>
+                            </FrameLayout>
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/top_right_right_bar_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentLeft="false"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:gravity="right" >
+
+                        <ImageButton
+                            android:id="@+id/browser_add_to_favorites_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@android:color/transparent"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:padding="0dp"
+                            android:src="@drawable/browser_add_favorite_up" />
+
+                        <ImageButton
+                            android:id="@+id/browser_remove_from_favorites_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:src="@drawable/browser_in_favorites_up"
+                            android:visibility="gone" />
+
+                        <ImageButton
+                            android:id="@+id/browser_favorites_list_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@android:color/transparent"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:padding="0dp"
+                            android:src="@drawable/browser_favorites_up" />
+
+                        <ImageButton
+                            android:id="@+id/browser_close_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@android:color/transparent"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:padding="0dp"
+                            android:src="@drawable/browser_close_up" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
 
 </LinearLayout>

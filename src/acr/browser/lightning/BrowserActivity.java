@@ -18,8 +18,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.BitmapDrawable;
@@ -59,6 +57,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
 public class BrowserActivity extends Activity implements BrowserController {
 
 	private DrawerLayout mDrawerLayout;
@@ -96,8 +96,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private final int API = android.os.Build.VERSION.SDK_INT;
 	private Drawable mDeleteIcon;
 	private Drawable mRefreshIcon;
-	private Drawable mCopyIcon;
-	private Drawable mIcon;
 	private int mActionBarSizeDp;
 	private int mNumberIconColor;
 	private String mHomepage;
@@ -107,6 +105,18 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private static LayoutParams mMatchParent = new LayoutParams(LayoutParams.MATCH_PARENT,
 			LayoutParams.MATCH_PARENT);
 	private BookmarkManager mBookmarkManager;
+	private ImageButton previousButton;
+	private ImageButton nextButton;
+	private ImageButton addFavoriteButton;
+	private ImageButton removeFavoriteButton;
+	private ImageButton favoritesListButton;
+	private Drawable mHttpsIcon;
+
+	private Drawable mSearchRightIcon;
+	private Drawable mSearchLeftIcon;
+	private Drawable mGoIcon;
+	private ImageButton closeButton;
+	private ImageButton homeButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +184,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mActionBar.setDisplayShowCustomEnabled(true);
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setDisplayHomeAsUpEnabled(false);
-		mActionBar.setCustomView(R.layout.search);
+		mActionBar.setCustomView(R.layout.search); 
 
 		RelativeLayout back = (RelativeLayout) findViewById(R.id.action_back);
 		RelativeLayout forward = (RelativeLayout) findViewById(R.id.action_forward);
@@ -195,33 +205,32 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 				@Override
 				public void onClick(View v) {
-					if (mCurrentView != null) {
-						if (mCurrentView.canGoForward()) {
-							mCurrentView.goForward();
-						}
-					}
+					goForward();
 				}
 
 			});
-		}
+		} 
 
 		// create the search EditText in the ActionBar
 		mSearch = (AutoCompleteTextView) mActionBar.getCustomView().findViewById(R.id.search);
+		 
 		mDeleteIcon = getResources().getDrawable(R.drawable.ic_action_delete);
-		mDeleteIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
-				Utils.convertToDensityPixels(mContext, 24));
-
+		mDeleteIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
+  
 		mRefreshIcon = getResources().getDrawable(R.drawable.ic_action_refresh);
-		mRefreshIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
-				Utils.convertToDensityPixels(mContext, 24));
+		mRefreshIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
+
+		mGoIcon = getResources().getDrawable(R.drawable.browser_go_up);
+		mGoIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
 		
-		mCopyIcon = getResources().getDrawable(R.drawable.ic_action_copy);
-		mCopyIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 24),
-				Utils.convertToDensityPixels(mContext, 24));
 		
-		mIcon = mRefreshIcon;
+		mSearchRightIcon = mRefreshIcon;
+
+		mHttpsIcon = getResources().getDrawable(R.drawable.browser_padlock);
+		mHttpsIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 28), Utils.convertToDensityPixels(mContext, 64));
+				
+		updateSearchIcons();
 		
-		mSearch.setCompoundDrawables(null, null, mRefreshIcon, null);
 		mSearch.setOnKeyListener(new OnKeyListener() {
 
 			@Override
@@ -257,8 +266,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 					}
 					updateUrl(mCurrentView.getUrl());
 				} else if (hasFocus) {
-					mIcon = mCopyIcon;
-					mSearch.setCompoundDrawables(null, null, mCopyIcon, null);
+					mSearchRightIcon = mGoIcon;
+					updateSearchIcons();
 				}
 			}
 		});
@@ -292,19 +301,12 @@ public class BrowserActivity extends Activity implements BrowserController {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (mSearch.getCompoundDrawables()[2] != null) {
-					boolean tappedX = event.getX() > (mSearch.getWidth()
-							- mSearch.getPaddingRight() - mIcon.getIntrinsicWidth());
+					boolean tappedX = event.getX() > (mSearch.getWidth() - mSearch.getPaddingRight() - mSearchRightIcon.getIntrinsicWidth());
 					if (tappedX) {
 						if (event.getAction() == MotionEvent.ACTION_UP) {
 							if (mSearch.hasFocus()) {
-								ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-								ClipData clip = ClipData.newPlainText("label", mSearch.getText()
-										.toString());
-								clipboard.setPrimaryClip(clip);
-								Utils.showToast(
-										mContext,
-										mContext.getResources().getString(
-												R.string.message_text_copied));
+								navigate();
+								//mCurrentView.loadUrl(mSearch.getText().toString());
 							} else {
 								refreshOrStop();
 							}
@@ -339,6 +341,74 @@ public class BrowserActivity extends Activity implements BrowserController {
 			WebIconDatabase.getInstance().open(getDir("icons", MODE_PRIVATE).getPath());
 		}
 
+		
+		previousButton = (ImageButton) findViewById(R.id.browser_previous_button);
+		previousButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goBack();
+			}
+		});
+		setupBackgroundChangeOnTouch(previousButton, R.drawable.browser_back_up, R.drawable.browser_back_down);
+
+		nextButton = (ImageButton) findViewById(R.id.browser_next_button);
+		nextButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goForward();
+			}
+		});
+		setupBackgroundChangeOnTouch(nextButton, R.drawable.browser_forward_up, R.drawable.browser_forward_down);
+
+		addFavoriteButton = (ImageButton) findViewById(R.id.browser_add_to_favorites_button);
+		addFavoriteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				addBookmark();
+			}
+		});
+		//setupBackgroundChangeOnTouch(addFavoriteButton, R.drawable.browser_add_favorite_up, R.drawable.browser_add_favorite_down);
+
+		removeFavoriteButton = (ImageButton) findViewById(R.id.browser_remove_from_favorites_button);
+		removeFavoriteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				removeBookmark();
+			}
+		});
+		//setupBackgroundChangeOnTouch(removeFavoriteButton, R.drawable.browser_in_favorites_up, R.drawable.browser_in_favorites_down);
+
+		favoritesListButton = (ImageButton) findViewById(R.id.browser_favorites_list_button);
+		favoritesListButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				toggleFavoritesList();
+			}
+		});
+		setupBackgroundChangeOnTouch(favoritesListButton, R.drawable.browser_favorites_up, R.drawable.browser_favorites_down);
+
+		closeButton = (ImageButton) findViewById(R.id.browser_close_button);
+		closeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				closeActivity();
+			}
+		});
+		setupBackgroundChangeOnTouch(closeButton, R.drawable.browser_close_up, R.drawable.browser_close_down);
+
+		homeButton = (ImageButton) findViewById(R.id.browser_home_button);
+		homeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mCurrentView.gotoHomepage();
+			}
+		});
+		setupBackgroundChangeOnTouch(homeButton, R.drawable.browser_home_up, R.drawable.browser_home_down);
+
+	}
+	
+	private void updateSearchIcons() {
+		mSearch.setCompoundDrawables(mSearchLeftIcon, null, mSearchRightIcon, null);
 	}
 
 	public void setNavigationDrawerWidth() {
@@ -416,6 +486,26 @@ public class BrowserActivity extends Activity implements BrowserController {
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	private void toggleFavoritesList() {
+		if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
+			closeBookmarks();
+		}else{
+			openBookmarks();
+		}
+	}
+	
+	private void refreshFavoriteButton() {
+		if (mBookmarkManager != null && mCurrentView != null && removeFavoriteButton != null && addFavoriteButton != null) {
+			if (mBookmarkManager.hasBookmark(mCurrentView.getUrl())) {
+				removeFavoriteButton.setVisibility(View.VISIBLE);
+				addFavoriteButton.setVisibility(View.GONE);
+			}else{
+				removeFavoriteButton.setVisibility(View.GONE);
+				addFavoriteButton.setVisibility(View.VISIBLE);
+			}
+		}
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action buttons
@@ -425,45 +515,77 @@ public class BrowserActivity extends Activity implements BrowserController {
 					mDrawerLayout.closeDrawer(mDrawerRight);
 				}
 				return true;
+				
 			case R.id.action_back:
-				if (mCurrentView != null) {
-					if (mCurrentView.canGoBack()) {
-						mCurrentView.goBack();
-					}
-				}
+				goBack();
 				return true;
+				
 			case R.id.action_forward:
-				if (mCurrentView != null) {
-					if (mCurrentView.canGoForward()) {
-						mCurrentView.goForward();
-					}
-				}
+				goForward();
 				return true;
 
-			case R.id.action_bookmarks:
-				openBookmarks();
-				return true;
 			case R.id.action_settings:
-				startActivity(new Intent(this, SettingsActivity.class));
+				openSettings();
 				return true;
+				
 			case R.id.action_history:
 				openHistory();
-				return true;
-			case R.id.action_add_bookmark:
-				if (!mCurrentView.getUrl().startsWith(Constants.FILE)) {
-					HistoryItem bookmark = new HistoryItem(mCurrentView.getUrl(),
-							mCurrentView.getTitle());
-					if (mBookmarkManager.addBookmark(bookmark)) {
-						mBookmarkList.add(bookmark);
-						Collections.sort(mBookmarkList, new SortIgnoreCase());
-						notifyBookmarkDataSetChanged();
-						mSearchAdapter.refreshBookmarks();
-					}
-				}
 				return true;
 
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void openSettings() {
+		startActivity(new Intent(this, SettingsActivity.class));
+	}
+
+	private void goForward() {
+		if (mCurrentView != null) {
+			if (mCurrentView.canGoForward()) {
+				mCurrentView.goForward();
+			}
+		}
+	}
+
+	private void goBack() {
+		if (mCurrentView != null) {
+			if (mCurrentView.canGoBack()) {
+				mCurrentView.goBack();
+			}
+		}
+	}
+
+	private void removeBookmark() {
+		for (int i = 0; i < mBookmarkList.size(); i++) {
+			if (mBookmarkList.get(i).getUrl().equals(mCurrentView.getUrl())) {
+				removeBookmark(i);
+				break;
+			}
+		}
+	}
+
+	private void removeBookmark(int position) {
+		if (mBookmarkManager.deleteBookmark(mBookmarkList.get(position).getUrl())) {
+			mBookmarkList.remove(position);
+			notifyBookmarkDataSetChanged();
+			mSearchAdapter.refreshBookmarks();
+		}
+		refreshFavoriteButton();
+	}
+	
+	private void addBookmark() {
+		if (!mCurrentView.getUrl().startsWith(Constants.FILE)) {
+			HistoryItem bookmark = new HistoryItem(mCurrentView.getUrl(),
+					mCurrentView.getTitle());
+			if (mBookmarkManager.addBookmark(bookmark)) {
+				mBookmarkList.add(bookmark);
+				Collections.sort(mBookmarkList, new SortIgnoreCase());
+				notifyBookmarkDataSetChanged();
+				mSearchAdapter.refreshBookmarks();
+			}
+			refreshFavoriteButton();
 		}
 	}
 
@@ -475,6 +597,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mBookmarkAdapter.clear();
 		mBookmarkAdapter.addAll(mBookmarkList);
 		mBookmarkAdapter.notifyDataSetChanged();
+		refreshFavoriteButton();
 	}
 
 	private class BookmarkItemClickListener implements ListView.OnItemClickListener {
@@ -510,13 +633,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									if (mBookmarkManager.deleteBookmark(mBookmarkList.get(position)
-											.getUrl())) {
-										mBookmarkList.remove(position);
-										notifyBookmarkDataSetChanged();
-										mSearchAdapter.refreshBookmarks();
-										openBookmarks();
-									}
+									removeBookmark(position);
 								}
 							})
 					.setNeutralButton(getResources().getString(R.string.action_edit),
@@ -1176,11 +1293,27 @@ public class BrowserActivity extends Activity implements BrowserController {
 					setIsFinishedLoading();
 				}
 			}, 200);
-
 		} else {
 			mProgressBar.setVisibility(View.VISIBLE);
 			setIsLoading();
 		}
+
+		if (mCurrentView != null && mSearch != null) {
+			String url = mCurrentView.getUrl();
+			if (url !=  null) {
+				if (url.startsWith("https")) {
+//					mSearch.setPadding(30, mSearch.getPaddingTop(), mSearch.getPaddingRight(), mSearch.getPaddingBottom());
+					mSearchLeftIcon = mHttpsIcon;
+					updateSearchIcons();
+				}else{
+//					mSearch.setPadding(10, mSearch.getPaddingTop(), mSearch.getPaddingRight(), mSearch.getPaddingBottom());
+					mSearchLeftIcon = null;
+					updateSearchIcons();
+				}
+			}
+		}
+		
+		refreshFavoriteButton();
 	}
 
 	@Override
@@ -1318,6 +1451,10 @@ public class BrowserActivity extends Activity implements BrowserController {
 	 */
 	private void openBookmarks() {
 		mDrawerLayout.openDrawer(mDrawerRight);
+	}
+
+	private void closeBookmarks() {
+		mDrawerLayout.closeDrawers();
 	}
 
 	public void closeDrawers() {
@@ -1771,8 +1908,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 	 */  
 	public void setIsLoading() {
 		if (!mSearch.hasFocus()) {
-			mIcon = mDeleteIcon;
-			mSearch.setCompoundDrawables(null, null, mDeleteIcon, null);
+			mSearchRightIcon = mDeleteIcon;
+			updateSearchIcons();
 		}
 	}
 
@@ -1782,8 +1919,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 	 */
 	public void setIsFinishedLoading() {
 		if (!mSearch.hasFocus()) {
-			mIcon = mRefreshIcon;
-			mSearch.setCompoundDrawables(null, null, mRefreshIcon, null);
+			mSearchRightIcon = mRefreshIcon;
+			updateSearchIcons();
 		}
 	}
 
@@ -1800,12 +1937,12 @@ public class BrowserActivity extends Activity implements BrowserController {
 			} else {
 				mCurrentView.reload();
 			}
-		}
+		}    
 	}
 
 	@Override
 	public boolean isActionBarShowing() {
-		if (mActionBar != null) {
+		if (mActionBar != null) { 
 			return mActionBar.isShowing();
 		} else {
 			return false;
@@ -1814,7 +1951,11 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	// Override this, use finish() for Incognito, moveTaskToBack for Main
 	public void closeActivity() {
-		finish();
+		Intent home = new Intent("android.intent.action.MAIN");
+		home.addCategory("android.intent.category.HOME");
+		startActivity(home);
+		this.overridePendingTransition(R.anim.test, R.anim.test);
+		//finish();
 	}
 
 	public class SortIgnoreCase implements Comparator<HistoryItem> {
@@ -1825,4 +1966,46 @@ public class BrowserActivity extends Activity implements BrowserController {
 		}
 
 	}
+	
+	private void setupBackgroundChangeOnTouch(final ImageButton imagebutton, final int upDrawableResource, final int downDrawableResource) {
+		imagebutton.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN )
+					imagebutton.setImageResource(downDrawableResource);
+
+				else if (event.getAction() == MotionEvent.ACTION_UP)
+					imagebutton.setImageResource(upDrawableResource);
+
+				return false;
+			}
+		});
+	}
+	
+	private void navigate() {
+		navigate(mSearch.getText().toString(), false);
+	}
+	
+	public void navigate(String url) {
+		navigate(url, false);
+	}
+	
+	private void navigate(String url, boolean fromSearch) {
+		String finalUrl = url;
+
+		if (! finalUrl.startsWith("http://") && ! finalUrl.startsWith("https://")) {
+			finalUrl = "http://" + url;
+		}
+
+		String[] schemes = {"http","https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+
+        if (urlValidator.isValid(finalUrl)) {
+		    mCurrentView.loadUrl(finalUrl);
+			mCurrentView.requestFocus();
+		}else{
+			searchTheWeb(url);
+        }
+	}	
 }

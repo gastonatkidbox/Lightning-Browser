@@ -17,8 +17,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
    
     <item android:id="@+id/action_history" android:title="@string/action_history" ></item>  
-    <item android:id="@+id/action_bookmarks" android:title="@string/action_bookmarks" ></item>
-    <item android:id="@+id/action_add_bookmark" android:title="@string/action_add_bookmark" ></item>
     <item android:id="@+id/action_settings" android:title="@string/settings" ></item>
     
 </menu>
