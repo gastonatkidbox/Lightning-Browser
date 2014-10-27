@@ -405,6 +405,51 @@ public class BrowserActivity extends Activity implements BrowserController {
 		});
 		setupBackgroundChangeOnTouch(homeButton, R.drawable.browser_home_up, R.drawable.browser_home_down);
 
+		previousButton = (ImageButton) findViewById(R.id.browser_previous_button);
+		previousButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goBack();
+			}
+		});
+		setupBackgroundChangeOnTouch(previousButton, R.drawable.browser_back_up, R.drawable.browser_back_down);
+
+		nextButton = (ImageButton) findViewById(R.id.browser_next_button);
+		nextButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goForward();
+			}
+		});
+		setupBackgroundChangeOnTouch(nextButton, R.drawable.browser_forward_up, R.drawable.browser_forward_down);
+
+		setPreviousButtonEnabled(mCurrentView.canGoBack());
+		setNextButtonEnabled(mCurrentView.canGoForward());
+
+	}
+	
+	private void setPreviousButtonEnabled(boolean enabled){
+		if (previousButton != null) {
+			previousButton.setEnabled(enabled);
+
+			if (enabled) {
+				previousButton.setImageResource(R.drawable.browser_back_up);
+			}else{
+				previousButton.setImageResource(R.drawable.browser_back_disabled);
+			}
+		}
+	}
+	
+	private void setNextButtonEnabled(boolean enabled){
+		if (nextButton != null) {
+			nextButton.setEnabled(enabled);
+
+			if (enabled) {
+				nextButton.setImageResource(R.drawable.browser_forward_up);
+			}else{
+				nextButton.setImageResource(R.drawable.browser_forward_disabled);
+			}
+		}
 	}
 	
 	private void updateSearchIcons() {
@@ -1293,6 +1338,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 					setIsFinishedLoading();
 				}
 			}, 200);
+
+			setPreviousButtonEnabled(mCurrentView.canGoBack());
+			setNextButtonEnabled(mCurrentView.canGoForward());
 		} else {
 			mProgressBar.setVisibility(View.VISIBLE);
 			setIsLoading();
@@ -1302,11 +1350,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 			String url = mCurrentView.getUrl();
 			if (url !=  null) {
 				if (url.startsWith("https")) {
-//					mSearch.setPadding(30, mSearch.getPaddingTop(), mSearch.getPaddingRight(), mSearch.getPaddingBottom());
 					mSearchLeftIcon = mHttpsIcon;
 					updateSearchIcons();
 				}else{
-//					mSearch.setPadding(10, mSearch.getPaddingTop(), mSearch.getPaddingRight(), mSearch.getPaddingBottom());
 					mSearchLeftIcon = null;
 					updateSearchIcons();
 				}
