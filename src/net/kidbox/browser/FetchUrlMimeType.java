@@ -87,8 +87,7 @@ public class FetchUrlMimeType extends Thread {
 		}
 
 		if (mimeType != null) {
-			if (mimeType.equalsIgnoreCase("text/plain")
-					|| mimeType.equalsIgnoreCase("application/octet-stream")) {
+			if (mimeType.equalsIgnoreCase("text/plain") || mimeType.equalsIgnoreCase("application/octet-stream")) {
 				String newMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
 						MimeTypeMap.getFileExtensionFromUrl(mUri));
 				if (newMimeType != null) {
@@ -96,7 +95,7 @@ public class FetchUrlMimeType extends Thread {
 				}
 			}
 			String filename = URLUtil.guessFileName(mUri, contentDisposition, mimeType);
-			mRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+			//mRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
 		}
 
 		// Start the download

@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">Lightning</string>
+    <string name="app_name">KidBox Browser</string>
     <string name="drawer_open">開啟導覽側欄</string>
     <string name="drawer_close">關閉導覽側欄</string>
     <string name="action_websearch">網路搜尋</string>
@@ -33,7 +33,6 @@
     <string name="advanced">進階設定</string>
     <string name="source">原始碼</string>
     <string name="license">版權資訊</string>
-    <string name="github">github.com/anthonycr/Lightning-Browser</string>
     <string name="apache">Apache License 2.0</string>
     <string name="title_activity_new_settings">新設定</string>
     <string name="action_settings">設定</string>

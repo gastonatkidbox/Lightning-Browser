@@ -22,22 +22,19 @@ public class AdBlock {
 
 	private static final Set<String> mBlockedDomainsList = new HashSet<String>();
 
-	private SharedPreferences mPreferences;
-
 	private boolean mBlockAds;
 
 	private static final Locale mLocale = Locale.getDefault();
 
-	public AdBlock(Context context) {
+	public AdBlock(Context context, boolean blockAds) {
 		if (mBlockedDomainsList.isEmpty()) {
 			loadBlockedDomainsList(context);
 		}
-		mPreferences = context.getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
-		mBlockAds = mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false);
+		mBlockAds = blockAds;
 	}
 
-	public void updatePreference() {
-		mBlockAds = mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false);
+	public void updatePreference(boolean blockAds) {
+		mBlockAds = blockAds;
 	}
 
 	private void loadBlockedDomainsList(final Context context) {

@@ -3,6 +3,8 @@
  */
 package net.kidbox.browser;
 
+import java.io.File;
+
 import net.kidbox.browser.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,9 +16,11 @@ import android.webkit.URLUtil;
 public class LightningDownloadListener implements DownloadListener {
 
 	private Activity mActivity;
+	private File downloadDir;
 
-	LightningDownloadListener(Activity activity) {
+	LightningDownloadListener(Activity activity, File downloadDir) {
 		mActivity = activity;
+		this.downloadDir = downloadDir;
 	}
 
 	@Override
@@ -29,7 +33,7 @@ public class LightningDownloadListener implements DownloadListener {
 				switch (which) {
 					case DialogInterface.BUTTON_POSITIVE:
 						DownloadHandler.onDownloadStart(mActivity, url, userAgent,
-								contentDisposition, mimetype, false);
+								contentDisposition, mimetype, false, downloadDir);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:

@@ -3,6 +3,8 @@
  */
 package net.kidbox.browser;
 
+import java.io.File;
+
 import net.kidbox.browser.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -48,7 +50,7 @@ public class DownloadHandler {
 	 *            If the request is coming from a private browsing tab.
 	 */
 	public static void onDownloadStart(Activity activity, String url, String userAgent,
-			String contentDisposition, String mimetype, boolean privateBrowsing) {
+			String contentDisposition, String mimetype, boolean privateBrowsing, File downloadDir) {
 		mActivity = activity;
 		// if we're dealing wih A/V content that's not explicitly marked
 		// for download, check if it's streamable.
@@ -79,8 +81,7 @@ public class DownloadHandler {
 				}
 			}
 		}
-		onDownloadStartNoStream(activity, url, userAgent, contentDisposition, mimetype,
-				privateBrowsing);
+		onDownloadStartNoStream(activity, url, userAgent, contentDisposition, mimetype, privateBrowsing, downloadDir);
 	}
 
 	// This is to work around the fact that java.net.URI throws Exceptions
@@ -132,7 +133,7 @@ public class DownloadHandler {
 	 */
 	/* package */
 	static void onDownloadStartNoStream(Activity activity, String url, String userAgent,
-			String contentDisposition, String mimetype, boolean privateBrowsing) {
+			String contentDisposition, String mimetype, boolean privateBrowsing, File downloadDir) {
 
 		String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
 
@@ -183,10 +184,9 @@ public class DownloadHandler {
 		// set downloaded file destination to /sdcard/Download.
 		// or, should it be set to one of several Environment.DIRECTORY* dirs
 		// depending on mimetype?
-
-		String location = mActivity.getSharedPreferences(PreferenceConstants.PREFERENCES, 0)
-				.getString(PreferenceConstants.DOWNLOAD_DIRECTORY, Environment.DIRECTORY_DOWNLOADS);
-		request.setDestinationInExternalPublicDir(location, filename);
+		
+		//String location = mActivity.getSharedPreferences(PreferenceConstants.PREFERENCES, 0).getString(PreferenceConstants.DOWNLOAD_DIRECTORY, Environment.DIRECTORY_DOWNLOADS);
+		request.setDestinationUri(Uri.fromFile(new File(downloadDir, filename)));
 		// let this downloaded file be scanned by MediaScanner - so that it can
 		// show up in Gallery app, for example.
 		request.allowScanningByMediaScanner();

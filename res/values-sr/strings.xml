@@ -17,7 +17,7 @@
 
 <resources>
 
-    <string name="app_name">Муња</string>
+    <string name="app_name">KidBox Browser</string>
     <string name="drawer_open">Отвори ладицу навигације</string>
     <string name="drawer_close">Затвори ладицу навигације</string>
     <string name="action_websearch">Веб претрага</string>
@@ -50,7 +50,6 @@
     <string name="advanced">Напредне поставке</string>
     <string name="source">Изворни кôд</string>
     <string name="license">Лиценца</string>
-    <string name="github">github.com/anthonycr/Lightning-Browser</string>
     <string name="apache">Апачи лиценца 2.0</string>
     <string name="title_activity_new_settings">Нове поставке</string>
     <string name="action_settings">Поставке</string>
@@ -157,7 +156,6 @@
     <string name="google_suggestions">Предлози претраге</string>
     <string name="powered_by_google">Погоњено Гуглом</string>
     <string name="title_adblock">Адблок</string>
-    <string name="message_adblock">Адблок је доступан само у плаћеном издању прегледача, „Lightning Browser+“. Доступан је за преузимање на Гугловом Плеју.</string>
     <string name="enable_orbot">Омогући Орбот</string>
     <string name="use_tor_prompt">Изгледа да имате Орбот инсталиран. Желите ли да користите Тор?</string>
     <string name="install_orbot">Инсталирајте Орбот да бисте користили Тор.</string>

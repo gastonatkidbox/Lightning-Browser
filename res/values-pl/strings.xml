@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lightning</string>
+    <string name="app_name">KidBox Browser</string>
     <string name="drawer_open">Otwórz szufladę nawigacyjną</string>
     <string name="drawer_close">Zamknij szufladę nawigacyjną</string>
     <string name="action_websearch">Wyszukiwarka internetowa</string>
@@ -33,7 +33,6 @@
     <string name="advanced">Ustawienia zaawansowane</string>
     <string name="source">Kod źródłowy</string>
     <string name="license">Licencja</string>
-    <string name="github">github.com/anthonycr/Lightning-Browser</string>
     <string name="apache">Apache License 2.0</string>
     <string name="title_activity_new_settings">NoweUstawienia</string>
     <string name="action_settings">Ustawienia</string>
@@ -140,7 +139,6 @@
     <string name="google_suggestions">Podpowiedzi wyszukiwania</string>
     <string name="powered_by_google">Dostarczane przez Google</string>
     <string name="title_adblock">Blokowanie reklam</string>
-    <string name="message_adblock">Blokowanie reklam jest obecnie dostępne tylko w płatnej wersji przeglądarki, Lightning Browser+. Jest ona dostępna do pobrania w sklepie Google Play.</string>
     <string name="enable_orbot">Włącz Orbota</string>
     <string name="use_tor_prompt">Wygląda na to że Orbot jest zainstalowany. Chciałbyś go włączyć i użyć sieci Tor do łączenia się z internetem?</string>
     <string name="install_orbot">Zanistaluj Orbota by móc używać sieci Tor do łączenia się z internetem.</string>

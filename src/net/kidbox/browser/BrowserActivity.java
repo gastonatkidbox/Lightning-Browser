@@ -28,6 +28,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Browser;
@@ -119,8 +120,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private Drawable mGoIcon;
 	private ImageButton closeButton;
 	private ImageButton homeButton;
-	private ImageButton closeKeyboard;
-	private View main;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +135,9 @@ public class BrowserActivity extends Activity implements BrowserController {
 		theme.resolveAttribute(R.attr.numberColor, typedValue, true);
 		mNumberIconColor = typedValue.data;
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
+		
+		boolean mBlockAds = onGetBlockAds();
+
 		mEditPrefs = mPreferences.edit();
 		mContext = this;
 		if (mIdList != null) {
@@ -168,8 +170,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 		styledAttributes.recycle();
 
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
-
-		//mTitleAdapter = new LightningViewAdapter(this, R.layout.tab_list_item, Currency);
 
 		mBookmarkList = mBookmarkManager.getBookmarks(true);
 		mBookmarkAdapter = new BookmarkViewAdapter(this, R.layout.bookmark_list_item, mBookmarkList);
@@ -217,40 +217,40 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		// create the search EditText in the ActionBar
 		mSearch = (AutoCompleteTextView) mActionBar.getCustomView().findViewById(R.id.search);
-		 
+
 		mDeleteIcon = getResources().getDrawable(R.drawable.ic_action_delete);
 		mDeleteIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
-  
+
 		mRefreshIcon = getResources().getDrawable(R.drawable.ic_action_refresh);
 		mRefreshIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
 
 		mGoIcon = getResources().getDrawable(R.drawable.browser_go_up);
 		mGoIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
-		
-		
+
+
 		mSearchRightIcon = mRefreshIcon;
 
 		mHttpsIcon = getResources().getDrawable(R.drawable.browser_padlock);
 		mHttpsIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 28), Utils.convertToDensityPixels(mContext, 64));
-				
+
 		updateSearchIcons();
-		
+
 		mSearch.setOnKeyListener(new OnKeyListener() {
 
 			@Override
 			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
 
 				switch (arg1) {
-					case KeyEvent.KEYCODE_ENTER:
-						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(mSearch.getWindowToken(), 0);
-						searchTheWeb(mSearch.getText().toString());
-						if (mCurrentView != null) {
-							mCurrentView.requestFocus();
-						}
-						return true;
-					default:
-						break;
+				case KeyEvent.KEYCODE_ENTER:
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(mSearch.getWindowToken(), 0);
+					searchTheWeb(mSearch.getText().toString());
+					if (mCurrentView != null) {
+						mCurrentView.requestFocus();
+					}
+					return true;
+				default:
+					break;
 				}
 				return false;
 			}
@@ -310,7 +310,6 @@ public class BrowserActivity extends Activity implements BrowserController {
 						if (event.getAction() == MotionEvent.ACTION_UP) {
 							if (mSearch.hasFocus()) {
 								navigate();
-								//mCurrentView.loadUrl(mSearch.getText().toString());
 							} else {
 								refreshOrStop();
 							}
@@ -345,7 +344,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			WebIconDatabase.getInstance().open(getDir("icons", MODE_PRIVATE).getPath());
 		}
 
-		
+
 		previousButton = (ImageButton) findViewById(R.id.browser_previous_button);
 		previousButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -391,6 +390,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		});
 		setupBackgroundChangeOnTouch(favoritesListButton, R.drawable.browser_favorites_up, R.drawable.browser_favorites_down);
 
+		/*
 		closeButton = (ImageButton) findViewById(R.id.browser_close_button);
 		closeButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -399,7 +399,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			}
 		});
 		setupBackgroundChangeOnTouch(closeButton, R.drawable.browser_close_up, R.drawable.browser_close_down);
-
+		 */
 		homeButton = (ImageButton) findViewById(R.id.browser_home_button);
 		homeButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -430,35 +430,12 @@ public class BrowserActivity extends Activity implements BrowserController {
 		setPreviousButtonEnabled(mCurrentView.canGoBack());
 		setNextButtonEnabled(mCurrentView.canGoForward());
 
-		main = (View) findViewById(R.id.main_layout);
-		main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			
-			@Override
-			public void onGlobalLayout() {
-				//TODO: Hay un conflicto entre las apps a pantalla completa y el resize, por eso el
-				//layout no se ajusta cuando se muestra el teclado.
-		        int heightDiff = main.getRootView().getHeight() - main.getHeight();
-		        if (heightDiff > 200) { // if more than 100 pixels, its probably a keyboard...
-		        	closeKeyboard.setVisibility(View.VISIBLE);
-		        }else{
-		        	closeKeyboard.setVisibility(View.GONE);
-		        }
-		    }
-		});
 
-		closeKeyboard = (ImageButton) findViewById(R.id.browser_close_keyboard);
-		closeKeyboard.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				closeKeyboard();
-			}
-		});
 
 	}
-	
-	private void closeKeyboard() {
-		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(main.getWindowToken(), 0);
+
+	protected boolean onGetBlockAds() {
+		return mPreferences.getBoolean(PreferenceConstants.BLOCK_ADS, false);
 	}
 	
 	private void setPreviousButtonEnabled(boolean enabled){
@@ -859,11 +836,16 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	protected synchronized void newTab(String url, boolean show) {
 		mIsNewIntent = false;
-		LightningView startingTab = new LightningView(mActivity, url);
+		LightningView startingTab = new LightningView(mActivity, url, onGetBlockAds(), onGetDownloadDir());
 
 		if (show) {
 			showTab(startingTab);
 		}
+	}
+
+	protected File onGetDownloadDir() {
+        String location = mActivity.getSharedPreferences(PreferenceConstants.PREFERENCES, 0).getString(PreferenceConstants.DOWNLOAD_DIRECTORY, Environment.DIRECTORY_DOWNLOADS);
+		return new File(location);
 	}
 
 	@Override
@@ -1012,7 +994,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		initializePreferences();
 		
 		if (mCurrentView != null) {
-			mCurrentView.initializePreferences(this);
+			mCurrentView.initializePreferences(this, onGetBlockAds());
 		} else {
 			initialize();
 		}
@@ -1108,80 +1090,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		return new BitmapDrawable(getResources(), bm);
 	}
-/*
-	public class LightningViewAdapter extends ArrayAdapter<LightningView> {
 
-		Context context;
-
-		int layoutResourceId;
-
-		List<LightningView> data = null;
-
-		public LightningViewAdapter(Context context, int layoutResourceId, List<LightningView> data) {
-			super(context, layoutResourceId, data);
-			this.layoutResourceId = layoutResourceId;
-			this.context = context;
-			this.data = data;
-		}
-
-		@Override
-		public View getView(final int position, View convertView, ViewGroup parent) {
-			View row = convertView;
-			LightningViewHolder holder = null;
-			if (row == null) {
-				LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-				row = inflater.inflate(layoutResourceId, parent, false);
-
-				holder = new LightningViewHolder();
-				holder.txtTitle = (TextView) row.findViewById(R.id.text1);
-				holder.favicon = (ImageView) row.findViewById(R.id.favicon1);
-				holder.exit = (ImageView) row.findViewById(R.id.delete1);
-				holder.exit.setTag(position);
-				row.setTag(holder);
-			} else {
-				holder = (LightningViewHolder) row.getTag();
-			}
-
-
-			LightningView web = data.get(position);
-			holder.txtTitle.setText(web.getTitle());
-			if (web.isForegroundTab()) {
-				holder.txtTitle.setTextAppearance(context, R.style.boldText);
-			} else {
-				holder.txtTitle.setTextAppearance(context, R.style.normalText);
-			}
-
-			Bitmap favicon = web.getFavicon();
-			if (web.isForegroundTab()) {
-
-				holder.favicon.setImageBitmap(favicon);
-			} else {
-				Bitmap grayscaleBitmap = Bitmap.createBitmap(favicon.getWidth(),
-						favicon.getHeight(), Bitmap.Config.ARGB_8888);
-
-				Canvas c = new Canvas(grayscaleBitmap);
-				Paint p = new Paint();
-				ColorMatrix cm = new ColorMatrix();
-
-				cm.setSaturation(0);
-				ColorMatrixColorFilter filter = new ColorMatrixColorFilter(cm);
-				p.setColorFilter(filter);
-				c.drawBitmap(favicon, 0, 0, p);
-				holder.favicon.setImageBitmap(grayscaleBitmap);
-			}
-			return row;
-		}
-
-		class LightningViewHolder {
-
-			TextView txtTitle;
-
-			ImageView favicon;
-
-			ImageView exit;
-		}
-	}
-*/
 	public class BookmarkViewAdapter extends ArrayAdapter<HistoryItem> {
 
 		Context context;
@@ -1831,7 +1740,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 								case DialogInterface.BUTTON_NEUTRAL:
 									if (API > 8) {
 										Utils.downloadFile(mActivity, url,
-												mCurrentView.getUserAgent(), "attachment", false);
+												mCurrentView.getUserAgent(), "attachment", false, onGetDownloadDir());
 									}
 									break;
 							}
@@ -1927,7 +1836,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 								case DialogInterface.BUTTON_NEUTRAL:
 									if (API > 8) {
 										Utils.downloadFile(mActivity, newUrl,
-												mCurrentView.getUserAgent(), "attachment", false);
+												mCurrentView.getUserAgent(), "attachment", false, onGetDownloadDir());
 									}
 									break;
 							}

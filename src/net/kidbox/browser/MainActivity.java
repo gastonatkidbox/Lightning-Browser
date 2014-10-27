@@ -1,9 +1,12 @@
 package net.kidbox.browser;
 
+import java.io.File;
+
 import net.kidbox.browser.R;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -20,6 +23,16 @@ public class MainActivity extends BrowserActivity {
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
 	}
 
+	@Override
+	protected File onGetDownloadDir() {
+		return new File(Environment.getExternalStorageDirectory(), "/CEIBAL/Mis descargas");
+	}
+	
+	@Override
+	protected boolean onGetBlockAds() {
+		return true;
+	}
+	
 	@Override
 	public void updateCookiePreference() {
 		if (mPreferences == null) {

@@ -62,12 +62,12 @@ public class LightningView {
 
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
-	public LightningView(Activity activity, String url) {
+	public LightningView(Activity activity, String url, boolean blockAds, File downloadDir) {
 
 		mActivity = activity;
 		mWebView = new WebView(activity);
 		mTitle = new Title(activity);
-		mAdBlock = new AdBlock(activity);
+		mAdBlock = new AdBlock(activity, blockAds);
 		activity.getPackageName();
 		mWebpageBitmap = BitmapFactory.decodeResource(activity.getResources(),
 				R.drawable.ic_webpage);
@@ -98,7 +98,7 @@ public class LightningView {
 
 		mWebView.setWebChromeClient(new LightningChromeClient(activity));
 		mWebView.setWebViewClient(new LightningWebClient(activity));
-		mWebView.setDownloadListener(new LightningDownloadListener(activity));
+		mWebView.setDownloadListener(new LightningDownloadListener(activity, downloadDir));
 		mGestureDetector = new GestureDetector(activity, new CustomGestureListener());
 		mWebView.setOnTouchListener(new OnTouchListener() {
 
@@ -134,7 +134,7 @@ public class LightningView {
 		mDefaultUserAgent = mWebView.getSettings().getUserAgentString();
 		mSettings = mWebView.getSettings();
 		initializeSettings(mWebView.getSettings(), activity);
-		initializePreferences(activity);
+		initializePreferences(activity, blockAds);
 
 		if (url != null) {
 			if (!url.trim().isEmpty()) {
@@ -182,10 +182,10 @@ public class LightningView {
 
 	@SuppressWarnings("deprecation")
 	@SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
-	public synchronized void initializePreferences(Context context) {
+	public synchronized void initializePreferences(Context context, boolean blockAds) {
 		mPreferences = context.getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
 		mHomepage = mPreferences.getString(PreferenceConstants.HOMEPAGE, Constants.HOMEPAGE);
-		mAdBlock.updatePreference();
+		mAdBlock.updatePreference(blockAds);
 		if (mSettings == null && mWebView != null) {
 			mSettings = mWebView.getSettings();
 		} else if (mSettings == null) {
@@ -533,6 +533,7 @@ public class LightningView {
 		@Override
 		public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
 			if (mAdBlock.isAd(url)) {
+				Log.d("AD", url);
 				ByteArrayInputStream EMPTY = new ByteArrayInputStream("".getBytes());
 				return new WebResourceResponse("text/plain", "utf-8", EMPTY);
 			}

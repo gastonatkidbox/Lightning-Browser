@@ -25,10 +25,10 @@ public final class Utils {
 	}
 
 	public static void downloadFile(final Activity activity, final String url,
-			final String userAgent, final String contentDisposition, final boolean privateBrowsing) {
+			final String userAgent, final String contentDisposition, final boolean privateBrowsing, File downloadDir) {
 		String fileName = URLUtil.guessFileName(url, null, null);
 		DownloadHandler.onDownloadStart(activity, url, userAgent, contentDisposition, null,
-				privateBrowsing);
+				privateBrowsing, downloadDir);
 		Log.i(Constants.TAG, "Downloading" + fileName);
 	}
 

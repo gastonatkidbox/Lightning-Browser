@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="app_name">Lightning</string>
+    <string name="app_name">KidBox Browser</string>
     <string name="google">جوجل</string>
     <string name="settings">إعدادات المتصفح</string>
     <string name="location">الوصول إلى موقعك</string>
@@ -22,7 +22,6 @@
     <string name="advanced">الإعدادات المتقدمة</string>
     <string name="source">رمز المصدر</string>
     <string name="license">الرخصة</string>
-    <string name="github">github.com/anthonycr/Lightning-Browser</string>
     <string name="apache"> ترخيص اباتشي 2.0</string>
     <string name="title_activity_new_settings">الإعدادات الجديدة</string>
     <string name="action_settings">الإعدادات</string>
