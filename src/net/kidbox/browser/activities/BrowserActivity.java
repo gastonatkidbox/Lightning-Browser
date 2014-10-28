@@ -2,16 +2,30 @@
  * Copyright 2014 A.C.R. Development
  */
 
-package net.kidbox.browser;
+package net.kidbox.browser.activities;
 
+import net.kidbox.browser.BookmarkManager;
+import net.kidbox.browser.BookmarkPage;
+import net.kidbox.browser.BrowserController;
+import net.kidbox.browser.ClickHandler;
+import net.kidbox.browser.Constants;
+import net.kidbox.browser.HistoryDatabaseHandler;
+import net.kidbox.browser.HistoryItem;
+import net.kidbox.browser.HistoryPage;
+import net.kidbox.browser.LightningView;
+import net.kidbox.browser.PreferenceConstants;
 import net.kidbox.browser.R;
+import net.kidbox.browser.SearchAdapter;
+import net.kidbox.browser.SettingsController;
+import net.kidbox.browser.Utils;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.NotificationManager;
 import android.content.*;
-import android.content.res.Configuration;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -118,8 +132,8 @@ public class BrowserActivity extends Activity implements BrowserController {
 	private Drawable mSearchRightIcon;
 	private Drawable mSearchLeftIcon;
 	private Drawable mGoIcon;
-	private ImageButton closeButton;
 	private ImageButton homeButton;
+	private LightningView downloadTab = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -150,8 +164,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mActivity = this;
 		mClickHandler = new ClickHandler(this);
 		mBrowserFrame = (FrameLayout) findViewById(R.id.content_frame);
-		mProgressBar = (ProgressBar) findViewById(R.id.activity_bar);
-		mProgressBar.setVisibility(View.GONE);
+		
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerRight = (LinearLayout) findViewById(R.id.right_drawer);
 		mDrawerListRight = (ListView) findViewById(R.id.right_drawer_list);
@@ -217,6 +230,11 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 		// create the search EditText in the ActionBar
 		mSearch = (AutoCompleteTextView) mActionBar.getCustomView().findViewById(R.id.search);
+
+		//mProgressBar = (ProgressBar) findViewById(R.id.activity_bar);
+		mProgressBar = (ProgressBar) findViewById(R.id.browser_load_progress);
+		//mProgressBar.setVisibility(View.GONE);
+		mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.browser_progress_not_loading_style));
 
 		mDeleteIcon = getResources().getDrawable(R.drawable.ic_action_delete);
 		mDeleteIcon.setBounds(0, 0, Utils.convertToDensityPixels(mContext, 64), Utils.convertToDensityPixels(mContext, 64));
@@ -401,13 +419,15 @@ public class BrowserActivity extends Activity implements BrowserController {
 		setupBackgroundChangeOnTouch(closeButton, R.drawable.browser_close_up, R.drawable.browser_close_down);
 		 */
 		homeButton = (ImageButton) findViewById(R.id.browser_home_button);
+		homeButton.setImageDrawable(onGetHomeButtonDrawable());
+		
 		homeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mCurrentView.gotoHomepage();
 			}
 		});
-		setupBackgroundChangeOnTouch(homeButton, R.drawable.browser_home_up, R.drawable.browser_home_down);
+		//setupBackgroundChangeOnTouch(homeButton, R.drawable.browser_home_up, R.drawable.browser_home_down);
 
 		previousButton = (ImageButton) findViewById(R.id.browser_previous_button);
 		previousButton.setOnClickListener(new OnClickListener() {
@@ -430,8 +450,13 @@ public class BrowserActivity extends Activity implements BrowserController {
 		setPreviousButtonEnabled(mCurrentView.canGoBack());
 		setNextButtonEnabled(mCurrentView.canGoForward());
 
+		//loadProgress = (ProgressBar) findViewById(R.id.browser_load_progress);
+		//loadProgress.setProgress(0);
 
+	}
 
+	protected Drawable onGetHomeButtonDrawable() {
+		return homeButton.getDrawable();
 	}
 
 	protected boolean onGetBlockAds() {
@@ -509,7 +534,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 		}
 		
 		//Habilita que se ocule la barra superior del navegador
-		mFullScreen = mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, true);
+		mFullScreen = onGetFullScreen();
 
 		//Oculta la barra superior de Android
 		//getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -517,6 +542,10 @@ public class BrowserActivity extends Activity implements BrowserController {
 		mSearchText = Constants.GOOGLE_SEARCH;
 
 		updateCookiePreference();
+	}
+
+	protected boolean onGetFullScreen() {
+		return mPreferences.getBoolean(PreferenceConstants.FULL_SCREEN, false);
 	}
 
 	/*
@@ -564,31 +593,26 @@ public class BrowserActivity extends Activity implements BrowserController {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action buttons
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
-					mDrawerLayout.closeDrawer(mDrawerRight);
-				}
-				return true;
-				
-			case R.id.action_back:
-				goBack();
-				return true;
-				
-			case R.id.action_forward:
-				goForward();
-				return true;
-
-			case R.id.action_settings:
-				openSettings();
-				return true;
-				
-			case R.id.action_history:
-				openHistory();
-				return true;
-
-			default:
-				return super.onOptionsItemSelected(item);
+		
+		if (item.getItemId() == android.R.id.home) {
+			if (mDrawerLayout.isDrawerOpen(mDrawerRight)) {
+				mDrawerLayout.closeDrawer(mDrawerRight);
+			}
+			return true;
+		}else if (item.getItemId() == R.id.action_back) {
+			goBack();
+			return true;
+		}else if (item.getItemId() == R.id.action_forward) {
+			goForward();
+			return true;
+		}else if (item.getItemId() == R.id.action_settings) {
+			openSettings();
+			return true;
+		}else if (item.getItemId() == R.id.action_history) {
+			openHistory();
+			return true;
+		}else{
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -836,11 +860,31 @@ public class BrowserActivity extends Activity implements BrowserController {
 
 	protected synchronized void newTab(String url, boolean show) {
 		mIsNewIntent = false;
-		LightningView startingTab = new LightningView(mActivity, url, onGetBlockAds(), onGetDownloadDir());
+		LightningView startingTab = new LightningView(mActivity, url, onGetBlockAds(), onGetDownloadDir()){
+			@Override
+			protected String getSearchEngineLogo() {
+				return onGetSearchEngineLogo(super.getSearchEngineLogo());
+			}
+			
+			@Override
+			protected String getSearchEngineUrl() {
+				return onGetSearchEngineUrl(super.getSearchEngineUrl());
+			}
+
+		};
 
 		if (show) {
 			showTab(startingTab);
 		}
+	}
+
+
+	protected String onGetSearchEngineUrl(String searchEngineUrl) {
+		return searchEngineUrl;
+	}
+	
+	protected String onGetSearchEngineLogo(String searchEngineLogo) {
+		return searchEngineLogo;
 	}
 
 	protected File onGetDownloadDir() {
@@ -1276,7 +1320,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					mProgressBar.setVisibility(View.INVISIBLE);
+					//mProgressBar.setVisibility(View.INVISIBLE);
 					setIsFinishedLoading();
 				}
 			}, 200);
@@ -1284,7 +1328,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			setPreviousButtonEnabled(mCurrentView.canGoBack());
 			setNextButtonEnabled(mCurrentView.canGoForward());
 		} else {
-			mProgressBar.setVisibility(View.VISIBLE);
+			//mProgressBar.setVisibility(View.VISIBLE);
 			setIsLoading();
 		}
 
@@ -1675,9 +1719,14 @@ public class BrowserActivity extends Activity implements BrowserController {
 		if (resultMsg == null) {
 			return;
 		}
-		newTab("", true);
+		
+		if (downloadTab != null) {
+			downloadTab.getWebView().destroy();
+		}
+		downloadTab = new LightningView(mActivity, "", false, onGetDownloadDir());
+
 		WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-		transport.setWebView(mCurrentView.getWebView());
+		transport.setWebView(downloadTab.getWebView());
 		resultMsg.sendToTarget();
 	}
 
@@ -1899,6 +1948,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			mSearchRightIcon = mDeleteIcon;
 			updateSearchIcons();
 		}
+		mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.browser_progress_loading_style));
 	}
 
 	/**
@@ -1910,6 +1960,7 @@ public class BrowserActivity extends Activity implements BrowserController {
 			mSearchRightIcon = mRefreshIcon;
 			updateSearchIcons();
 		}
+		mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.browser_progress_not_loading_style));
 	}
 
 	/**

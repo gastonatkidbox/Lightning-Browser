@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/browserLicense"
+        android:id="@+id/kidboxBrowserLicense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/listChoiceBackgroundIndicator"
@@ -29,15 +29,63 @@
             android:text="@string/mpl_license"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/light" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="http://www.kidbox.net"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/light" />
     </LinearLayout>
-    
+
     <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:background="#cdcdcd" />
-    
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="#cdcdcd" />
+
+    <LinearLayout
+        android:id="@+id/lightningBrowserLicense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/listChoiceBackgroundIndicator"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="Lightning Browser"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="@string/mpl_license"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/light" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="https://github.com/anthonycr/Lightning-Browser"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/light" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="#cdcdcd" />
+
     <LinearLayout
         android:id="@+id/licenseAOSP"
         android:layout_width="match_parent"
@@ -64,13 +112,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/light" />
     </LinearLayout>
+
     <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:background="#cdcdcd" />
-    
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="#cdcdcd" />
+
     <LinearLayout
         android:id="@+id/licenseHosts"
         android:layout_width="match_parent"
@@ -97,10 +146,12 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/light" />
     </LinearLayout>
+
     <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:background="#cdcdcd" />
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="#cdcdcd" />
+
 </LinearLayout>

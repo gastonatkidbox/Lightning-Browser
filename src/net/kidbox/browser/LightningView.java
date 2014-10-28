@@ -150,22 +150,24 @@ public class LightningView {
 	public void gotoHomepage() {
 		if (mHomepage.startsWith("about:home")) {
 			mWebView.loadUrl(getHomepage());
+			
 		} else if (mHomepage.startsWith("about:bookmarks")) {
 			mBrowserController.openBookmarkPage(mWebView);
+			
 		} else {
 			mWebView.loadUrl(mHomepage);
 		}
 	}
 	
-	public String getHomepage() {
+	protected String getHomepage() {
 		String home;
 	
 		HomepageVariables hp = new HomepageVariables(getActivity());
 		// GOOGLE_SEARCH;
 		home = hp.getHEAD();
-		home = home + "file:///android_asset/google.png";
+		home = home + getSearchEngineLogo();
 		home = home + hp.getMIDDLE();
-		home = home + Constants.GOOGLE_SEARCH;
+		home = home + getSearchEngineUrl();
 		home = home + hp.getEND();
 
 		File homepage = new File(mActivity.getFilesDir(), "homepage.html");
@@ -178,6 +180,14 @@ public class LightningView {
 		}
 
 		return Constants.FILE + homepage;
+	}
+
+	protected String getSearchEngineUrl() {
+		return Constants.GOOGLE_SEARCH;
+	}
+
+	protected String getSearchEngineLogo() {
+		return "file:///android_asset/google.png";
 	}
 
 	@SuppressWarnings("deprecation")

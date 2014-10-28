@@ -108,36 +108,30 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
 		holder.mUrl.setText(web.getUrl());
 
 		int imageId = R.drawable.ic_bookmark;
-		switch (web.getImageId()) {
-			case R.drawable.ic_bookmark: {
-				if (!mIncognito) {
-					imageId = R.drawable.ic_bookmark;
-				} else {
-					holder.mTitle.setTextColor(Color.WHITE);
-					imageId = R.drawable.ic_bookmark_dark;
-				}
-				break;
+		
+		if (web.getImageId() == R.drawable.ic_bookmark) {
+			if (!mIncognito) {
+				imageId = R.drawable.ic_bookmark;
+			} else {
+				holder.mTitle.setTextColor(Color.WHITE);
+				imageId = R.drawable.ic_bookmark_dark;
 			}
-			case R.drawable.ic_search: {
-				if (!mIncognito) {
-					imageId = R.drawable.ic_search;
-				} else {
-					holder.mTitle.setTextColor(Color.WHITE);
-					imageId = R.drawable.ic_search_dark;
-				}
-				break;
+		}else if (web.getImageId() == R.drawable.ic_search) {
+			if (!mIncognito) {
+				imageId = R.drawable.ic_search;
+			} else {
+				holder.mTitle.setTextColor(Color.WHITE);
+				imageId = R.drawable.ic_search_dark;
 			}
-			case R.drawable.ic_history: {
-				if (!mIncognito) {
-					imageId = R.drawable.ic_history;
-				} else {
-					holder.mTitle.setTextColor(Color.WHITE);
-					imageId = R.drawable.ic_history_dark;
-				}
-				break;
+		}else if (web.getImageId() == R.drawable.ic_history) {
+			if (!mIncognito) {
+				imageId = R.drawable.ic_history;
+			} else {
+				holder.mTitle.setTextColor(Color.WHITE);
+				imageId = R.drawable.ic_history_dark;
 			}
 		}
-
+		
 		holder.mImage.setImageDrawable(mContext.getResources().getDrawable(imageId));
 
 		return row;

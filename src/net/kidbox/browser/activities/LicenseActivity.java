@@ -1,9 +1,11 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package net.kidbox.browser;
+package net.kidbox.browser.activities;
 
 import net.kidbox.browser.R;
+import net.kidbox.browser.R.id;
+import net.kidbox.browser.R.layout;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,28 +26,27 @@ public class LicenseActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.license_activity);
 
-		//Oculta la barra superior de Android
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
 		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		findViewById(R.id.browserLicense).setOnClickListener(this);
+		findViewById(R.id.kidboxBrowserLicense).setOnClickListener(this);
+		findViewById(R.id.lightningBrowserLicense).setOnClickListener(this);
 		findViewById(R.id.licenseAOSP).setOnClickListener(this);
 		findViewById(R.id.licenseHosts).setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
-		switch (v.getId()) {
-			case R.id.browserLicense:
-				actionView("http://www.mozilla.org/MPL/2.0/");
-				break;
-			case R.id.licenseAOSP:
-				actionView("http://www.apache.org/licenses/LICENSE-2.0");
-				break;
-			case R.id.licenseHosts:
-				actionView("http://hosts-file.net/");
-				break;
+		if (v.getId() == R.id.kidboxBrowserLicense) {
+			actionView("http://www.mozilla.org/MPL/2.0/");
+			
+		}else if (v.getId() == R.id.lightningBrowserLicense) {
+			actionView("http://www.mozilla.org/MPL/2.0/");
+			
+		}else if (v.getId() == R.id.licenseAOSP) {
+			actionView("http://www.apache.org/licenses/LICENSE-2.0");
+			
+		}else if (v.getId() == R.id.licenseHosts) {
+			actionView("http://hosts-file.net/");
 		}
 	}
 

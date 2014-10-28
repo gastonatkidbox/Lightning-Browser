@@ -1,9 +1,16 @@
 /*
  * Copyright 2014 A.C.R. Development
  */
-package net.kidbox.browser;
+package net.kidbox.browser.activities;
 
+import net.kidbox.browser.HistoryDatabaseHandler;
+import net.kidbox.browser.PreferenceConstants;
 import net.kidbox.browser.R;
+import net.kidbox.browser.SettingsController;
+import net.kidbox.browser.Utils;
+import net.kidbox.browser.R.id;
+import net.kidbox.browser.R.layout;
+import net.kidbox.browser.R.string;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -58,8 +65,6 @@ public class SettingsActivity extends Activity {
 
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
 		if (mPreferences.getBoolean(PreferenceConstants.HIDE_STATUS_BAR, false)) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 
 		mSystemBrowser = mPreferences.getBoolean(PreferenceConstants.SYSTEM_BROWSER_PRESENT, false);
@@ -85,10 +90,6 @@ public class SettingsActivity extends Activity {
 		}
 
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
-
-		//Oculta la barra superior de Android
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 
 		mEditPrefs = mPreferences.edit();
 

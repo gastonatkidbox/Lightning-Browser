@@ -1,8 +1,10 @@
-package net.kidbox.browser;
+package net.kidbox.browser.activities;
 
 import java.io.File;
 
+import net.kidbox.browser.PreferenceConstants;
 import net.kidbox.browser.R;
+import net.kidbox.browser.R.menu;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,6 +23,11 @@ public class MainActivity extends BrowserActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mPreferences = getSharedPreferences(PreferenceConstants.PREFERENCES, 0);
+	}
+	
+	@Override
+	protected boolean onGetFullScreen() {
+		return false;
 	}
 
 	@Override
