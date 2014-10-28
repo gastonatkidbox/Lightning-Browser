@@ -2046,5 +2046,5 @@ public class BrowserActivity extends Activity implements BrowserController {
 		}else{
 			searchTheWeb(url);
         }
-	}	
+	}
 }
